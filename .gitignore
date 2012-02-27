@@ -1,0 +1,11 @@
+*.pyc
+# db files, sqlite & RDF hashes
+*.db
+*.bak
+*~
+.svn
+*.swp
+*.orig
+venv/
+repositories/
+run/media/

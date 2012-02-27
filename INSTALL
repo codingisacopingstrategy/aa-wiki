@@ -1,0 +1,74 @@
+FIXME: The instruction in this file are outdated since the refactoring of
+aacore.
+
+
+This is the INSTALL file for Active Archives (AA). This document provides
+convenient steps so a user/developer can have AA running quickly.
+
+
+Dependencies
+============
+
+Please first install these software in order to get AA running properly:
+
+  - Django += 1.3 <http://www.djangoproject.org/>
+  - SQLite3 <http://www.sqlite.org/>
+  - PySQLite2 <http://trac.edgewall.org/wiki/PySqlite>
+  - Git <http://git-scm.com/>
+  - Git-Python <http://gitorious.org/git-python>
+  - Google-diff-match-patch <http://code.google.com/p/google-diff-match-patch/>
+  - Python html5lib <http://code.google.com/p/html5lib/>
+  - Python markdown += 2.1 <http://www.freewisdom.org/projects/python-markdown/>
+  - Python dateutil <http://labix.org/python-dateutil>
+  - Pygraphviz <http://networkx.lanl.gov/pygraphviz/>
+  - Python librdf (Redland) <http://librdf.org/>
+
+On Ubuntu, this should do the trick:
+
+    sudo apt-get install python-pip
+    sudo pip install django
+    sudo pip install gitpython
+    sudo pip install html5lib
+    sudo pip install markdown
+    sudo pip install diff-match-patch
+    sudo pip install python-dateutil
+    sudo pip install pygraphviz
+    sudo apt-get install python-librdf
+
+Additionally, you'll need the following for the RDF sniffers:
+
+  - Exiftool
+  - Ffmpeg
+  - Imagemagick
+
+
+Quick Installation
+==================
+
+1. Clone the repository onto your machine
+
+       git clone git@git.constantvzw.org:aa.core.git 
+
+1. Once you've installed the required dependencies:
+
+       cd /path/to/aa.core/run
+
+2. Build the database:
+
+       python manage syncdb
+
+   The prompt will ask for the admin infos and fixtures will be loaded.
+   
+3. Run the django webserver:
+
+       python manage.py runserver
+
+4. Configure the project domain name at:
+
+       <http://localhost:8000/admin/sites/site/1/>
+
+   Typically the value must be "localhost:8000" if you are running the project
+   on a local server.
+
+
+vim: ft=markdown:

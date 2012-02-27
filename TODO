@@ -1,0 +1,109 @@
+High priority
+=============
+
+- Skip tag
+- Create new page: default content that give clues
+    - First page directly created?
+    - Give a location to the first annotation
+    - add annotation button: predefined location + meaningful text too.
+* Improve history 
+    * Be able to revert a page
+- layer palette doesn't refresh
+
+
+Low priority
+============
+
+- BUG: negative positions
+- bug with column ":" in url: sould be escaped by the wikify function.
+- shift to enable the grid snapping
+- javascript scrollbars (less ugly)
+- draggable help
+- extra menu to show/hide annotation by criterias
+- Metadata in the sidebar
+- edit locks?
+- button to remove the about attribute/ drag the @ to remove the about attribute + confirmation
+- "attach" boxes
+    - with data-anchor, data-position (north, south, east, west etc.)
+- configure serve to serve best html5 video/audio
+- RSS feeds
+- Still a problem with non consecutive header levels...
+- list pages filter ?
+
+Ideas
+=====
+
+- html5 audio/video: preload="auto"?
+- How can RDF be useful for collective commenting and annotating?
+- rdf metadata to create relation between pages. EG. translation.
+- move page
+- How to preserve the title attribute with the new syntax ([[embed::ressource]])?
+- manual sectioning "8<---"? What about the <br /> tag which is semantically correct for this?
+- Notion of focus for media, to know which one is being controlled
+- different types of landmarks... what syntax?
+
+Oralsite workshop remarks
+=========================
+
+- video leads text/text leads video
+- embed webpages = iframe?
+
+- A nice sniffer: `file`:
+
+    ➜  ~  file /tmp/marqueurs.txt    
+    /tmp/marqueurs.txt: ASCII English text, with very long lines
+
+- annotation negative position happens when one rescales the annotation "outside" the screen.
+- manual to update
+- how to change the embed wrapper?
+
+Meeting 01/2012
+===============
+
+- drop-down css don't work on time-based medias
+
+Navigation
+----------
+
+- how to come back to TOC when sidebar is closed
+- TOC links weird
+- Bug when resizing a box it goes up
+- home page different than publication homepage
+- cinematic mode shows hidden boxes in edit mode
+- drag and drop classes
+- more explicit class names
+- show sound files in the timeline
+- background appears in cinematic mode?
+- remove decorations with classes
+- play/read mode: choose to put a border or not on the boxes
+- if timeline, mode name = play, otherwise mode name = read.
+- possibility to keep titles
+- play/pause/skip to next landmark
+- use the timeline to fly to a box (already working)
+
+Bug
+---
+
+- carriage return on titles
+- history: date sections not accurate
+- Jonathan Burrows on Scores: play mode: sidebar opened the images overflow
+- lightbox: missing navigation buttons
+- renumber section when one gets deleted
+- Question marks in wiki links are mistakenly decoded
+    [[What's the Score Now?]] --> http://localhost:8000/pages/What%27s_the_Score_Now/?/edit/
+- Pages names must not contain non-ascii characters
+
+
+Meeting 27/01/2012
+==================
+
+- Namespace for Ritz
+
+
+LGRU
+====
+
+- sidebar opened by default.
+- editable stylesheets
+- file upload
+- Rester en contact avec Bachir pour l'hébergement + donner accès à Active Archives. Serveur des laboratoires.
