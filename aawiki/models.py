@@ -18,6 +18,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.contrib.auth.models import User
 
+from aacore.models import reindex_request
 import aawiki.utils
 from aacore import rdfutils
 from aacore.rdfutils import (rdfnode, prep_uri)
@@ -112,6 +113,7 @@ class Page(models.Model):
 #        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
 
         self.save()
+        reindex_request.send(sender=self.__class__, instance=self)
 
     def read(self, rev="HEAD"):
         """

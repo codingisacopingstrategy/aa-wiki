@@ -75,9 +75,9 @@ def replace_timecodes(lines):
                 attr = mm.group('attributes')
 
             if end:
-                line = '## %%%%aa:start::%(start)s%%%% %%%%aa:end::%(end)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" data-end="%(end)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% %%%%aa:end::%(end)s%%%% %(otherstuff)s{: %(attr)s property="aa:annotation" data-start="%(start)s" data-end="%(end)s" }' % locals()
             else:
-                line = '## %%%%aa:start::%(start)s%%%% %(otherstuff)s{: %(attr)s data-start="%(start)s" }' % locals()
+                line = '## %%%%aa:start::%(start)s%%%% %(otherstuff)s{: %(attr)s property="aa:annotation" data-start="%(start)s" }' % locals()
         newlines.append(line)
     return newlines
 

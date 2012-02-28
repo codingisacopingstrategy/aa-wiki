@@ -9,6 +9,7 @@
 <head>
     {% block head %}
     <meta charset="utf-8" />
+    <link rel="index" href="{% url  aa-index %}"/>
 
     <!--<meta http-equiv="pragma" content="no-cache" />-->
     <!--<meta http-equiv="cache-control" content="max-age=0" />-->
@@ -17,8 +18,8 @@
 
     <title>{% block title %}active archives{% endblock %}</title>
 
-    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css' />
+    <link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css' />
 
     <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/jquery.layout.css" type="text/css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/activearchives.css" type="text/css" />

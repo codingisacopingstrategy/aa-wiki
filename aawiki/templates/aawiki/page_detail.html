@@ -39,9 +39,9 @@
         <span id="time">00:00:00 / 00:12:35</span>
         <form id="mode">
             {% if meta.mode|first|lower == "play" %}
-            <input type="radio" id="modeedit" name="mode" value="edit"><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked"><label for="modeplay">cinematic</label>
+            <input type="radio" id="modeedit" name="mode" value="edit" /><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked" /><label for="modeplay">cinematic</label>
             {% else %}
-            <input type="radio" id="modeedit" name="mode" value="edit" checked="checked"><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play"><label for="modeplay">cinematic</label>
+            <input type="radio" id="modeedit" name="mode" value="edit" checked="checked" /><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" /><label for="modeplay">cinematic</label>
             {% endif %}
         </form>
     </nav>

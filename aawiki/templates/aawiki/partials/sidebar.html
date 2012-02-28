@@ -35,9 +35,9 @@
 
     <hgroup>
     {% if meta.title %}
-        <h1>{{ meta.title|first }}</h1>
+        <h1 property="dc:title">{{ meta.title|first }}</h1>
     {% else %}
-        <h1>{{ page.name }}</h1>
+        <h1 property="dc:title">{{ page.name }}</h1>
     {% endif %}
 
     {% if meta.subtitle %}
