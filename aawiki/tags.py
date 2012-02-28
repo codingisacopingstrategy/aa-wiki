@@ -7,6 +7,9 @@ http://effbot.org/zone/django-simple-template.htm
 import re
 import os
 from aawiki.utils import dewikify
+import aacore.utils 
+from aacore.rdfutils import query
+from urlparse import urlparse
 
 
 def render_tpl(template):
@@ -41,14 +44,70 @@ def render_tpl(template):
 
 def render_tag(tag):
     tag = tag.strip()
-    if tag == "list_pages":
-        return list_pages()
-    else:
-        return "<mark>%s doesn't exists</mark>" % tag
+    try:
+        (tag, arguments) = tag.split(" ", 1)
+    except ValueError:
+        arguments = None
+
+    tags = {}
+    for t in AATag.__subclasses__():
+        tags[t.name] = t
+
+    try:
+        return tags[tag](arguments).output
+    except KeyError:
+        return "<mark>The %s tag doesn't exists</mark>" % tag
 
 
-def list_pages():
-    return '<ul><li>' + '</li><li>'.join(['<a href="../%s">%s</a>' % (page, dewikify(page)) for page in os.listdir('/home/aleray/work/aa.new/aa.core/run/repositories')]) + '</li></ul>'
+class AATag(object):
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        self.output = self.run()
+
+
+class AASparql(AATag):
+    name = "sparql"
+
+    def run(self):
+        m = aacore.utils.get_rdf_model()
+        return "ok"
+
+
+class AAPageList(AATag):
+    name = "pagelist"
+
+    def run(self):
+        m = aacore.utils.get_rdf_model()
+
+        ret = query("""\
+                SELECT DISTINCT ?url ?title 
+                WHERE { 
+                    ?url <http://www.w3.org/1999/xhtml/vocab#index> ?c. 
+                    ?url <http://purl.org/dc/elements/1.1/title> ?title. 
+                }""", m)
+
+        foo = ["<ul>"]
+        for i in ret:
+            path = urlparse(str(i['url'])).path
+            foo.append('<li><a href="%s">%s</a></li>' % (path, str(i['title'])))
+        foo.append("</ul>")
+        return "".join(foo)
+
+
+class AAAnnotations(AATag):
+    name = "annotations"
+
+    def run(self):
+        m = aacore.utils.get_rdf_model()
+        ret = query("""
+                SELECT ?a WHERE { 
+                    <http://www.lemonde.fr/> <http://activearchives.org/terms/annotation> ?a . 
+                }""", m)
+        foo = []
+        for i in ret:
+            foo.append("<section class='section2'>%s</section>" % str(i['a']))
+        return "".join(foo)
 
 
 if __name__ == "__main__":
