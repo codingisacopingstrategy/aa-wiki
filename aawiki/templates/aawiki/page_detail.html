@@ -34,16 +34,18 @@
 
 
 {% block body %}
+{% get_markdown_for content as md meta %}
 <nav id="timeline" class="ui-layout-north">
     <nav id="controls">
         <span id="playpause">play</span>
         <span id="time">00:00:00 / 00:12:35</span>
         <form id="mode">
-            {% if meta.mode|first|lower == "play" %}
-            <input type="radio" id="modeedit" name="mode" value="edit" /><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" checked="checked" /><label for="modeplay">cinematic</label>
-            {% else %}
-            <input type="radio" id="modeedit" name="mode" value="edit" checked="checked" /><label for="modeedit">canvas</label><input type="radio" id="modeplay" name="mode" value="play" /><label for="modeplay">cinematic</label>
-            {% endif %}
+            {% spaceless %}            
+                {% for mode in meta.mode %}
+                    <input type="radio" id="mode{{ mode|lower|slugify }}" name="mode" value="{{ mode|lower|slugify }}" />            
+                    <label for="mode{{ mode|lower|slugify }}">{{ mode|lower }}</label>
+                {% endfor %}
+            {% endspaceless %}
         </form>
     </nav>
 <div id="timelineslider"></div>
@@ -51,7 +53,6 @@
 
 <iframe id="browser-panel" class="ui-layout-south"></iframe>
 
-{% get_markdown_for content as md meta %}
 <article id="canvas" class="ui-layout-center
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}
                             {% if meta.type %}{{ meta.type|first }}{% endif %}">
