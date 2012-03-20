@@ -1,6 +1,7 @@
-{% extends "aawiki/base_wiki.html" %}
+{% extends "aawiki/base.html" %}
 
-{% load aacoretags %}
+{% load aacoretags aawikitags %}
+
 
 {% block title %}{{ block.super }} | Editing {{ page.name }}{% endblock %}
 
@@ -13,19 +14,19 @@
             collapsible: true
         });
 
-        $("#tab-this").tabs();
+        $("#accordion").accordion({ fillSpace: true });
 
         $('body').layout({
             applyDefaultStyles: false,
             enableCursorHotkey: false,
             west: {
-                size: "250",
+                size: "220",
                 fxName: "slide",
                 fxSpeed: "fast",
                 initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
-                closable: true,
+                closable: false,
                 resizable: false,
                 togglerAlign_closed : 'center',
                 togglerAlign_open : 'center',
@@ -35,9 +36,14 @@
                 spacing_open: 16,
                 togglerLength_open: -1,
                 togglerLength_closed: -1,
-                showOverflowOnHover: false
+                showOverflowOnHover: false,
+                onresize: function () {
+                    $('#accordion').accordion('resize');
+                }
             }
         });
+
+        $('#accordion').accordion('resize');
     });
 })(jQuery);
 </script>
@@ -46,11 +52,6 @@
 
 {% block body %}
 <div id="page-edit" class="ui-layout-center">
-{% if page %}
-<h1>Editing {{ page.name }}</h1>
-{% else %}
-<h1>Creating {{ name }}</h1>
-{% endif %}
 <form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
     {% if section %}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
     {{ form.as_p }}
@@ -59,67 +60,79 @@
 </div>
 {% endblock %}
 
+{% block extrasidebar %}
+    {% get_markdown_for content as md meta %}
 
-{% block postbody %}
-<nav id="sidebar" class="ui-layout-west"> 
-    <div id="login">
-        {% if user.is_authenticated %}
-            <a title="Logout" href="{% url aa-logout %}">Logout</a>
-        {% else %}
-            <a title="Login" href="{% url aa-login %}">Login</a>
-        {% endif %}
-    </div>
-    <div>
-    <!--<h1 class="logo">-->
-        <!--[><a title="Back to main page" href="{% url aa-index %}"><]-->
-            <!--[><span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span><]-->
-        <!--[></a><]-->
-        <!--<a title="Back to main page" href="{% url aa-index %}">-->
-            <!--Oralsite-->
-        <!--</a>-->
-    <!--</h1>-->
-    <!--<p><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></p>-->
-    <!--<hr>-->
-        {% if page %}
-            {% if user.is_authenticated %}
-                <ul id="toolbar">
-                    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-                    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
-                </ul>
-            {% endif %}
-        {% endif %}
+    {% if page %}{% if user.is_authenticated %}
+    <ul id="toolbar">
+        <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+        <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+    </ul>
+    {% endif %}{% endif %}
 
-        <header>
-            <hgroup>
-                {% if meta.title %}
-                    <h1>{{ meta.title|first }}</h1>
-                {% else %}
-                    <h1>{{ page.name }}</h1>
+    <hgroup>
+        <p>editing</p>
+    {% if meta.title %}
+        <h1 property="dc:title">{{ meta.title|first }}</h1>
+    {% else %}
+        <h1 property="dc:title">{{ page.name }}</h1>
+    {% endif %}
+
+    {% if meta.subtitle %}
+        <h2>{{ meta.subtitle|first }}</h2>
+    {% endif %}
+    </hgroup>
+    <div class="ui-layout-content">
+        <div id="accordion">
+            <h3><a href="#">Introduction</a></h3>
+            <div>
+                <div>
+                {% if meta.ispartof %}
+                <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
+                {% for publication in meta.ispartof %}
+                “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
+                {% endfor %}
                 {% endif %}
-                {% if meta.subtitle %}
-                    <h2>{{ meta.subtitle|first }}</h2>
+
+                {% if meta.with %}<p>With {{ meta.with|join:', ' }}.</p>{% endif %}
+                {% if meta.editedby %}<p>Edited by {{ meta.editedby|join:', ' }}.</p>{% endif %}
+                {% if meta.authors %}
+                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
                 {% endif %}
-            </hgroup>
+                </div>
 
-            {% if meta.ispartof %}
-            <p>This page is part of the publication{{ meta.ispartof|pluralize }} {{ meta.ispartof|join:"," }}.</p>
-            {% endif %}
-        </header>
-    </div>
-
-    <div id="tab-this">
-        <ul id="aa-tabs">
-            <li><a title="Help" href="#tab-help">Help</a></li>
-        </ul>
-
-        <div id="tab-help" class="aa-tab">
-            <div id="help">
-            {% include "aawiki/partials/playmode_classes_help.html" %}
-            {% include "aawiki/partials/metadata_help.html" %}
-            {% include "aawiki/partials/filters_help.html" %}
-            {% include "aawiki/partials/markdown_help.html" %}
+                {% for summary in meta.summary %}
+                {% get_markdown_for summary as md meta %}
+                {{ md|safe }}
+                {% endfor %}
             </div>
+            
+            {% if user.is_authenticated %}
+            <h3><a href="#">Help</a></h3>
+            <div id="tab-help">
+                {% include "aawiki/partials/metadata_help.html" %}
+                {% include "aawiki/partials/timecode_help.html" %}
+                {% include "aawiki/partials/filters_help.html" %}
+                {% include "aawiki/partials/markdown_help.html" %}
+            </div>
+
+            <h3><a href="#">Upload</a></h3>
+            <div id="tab-upload">
+                <form id="upload" action="/upload/" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <input type="file" value="" name="file" multiple />
+                    <button type="submit">Upload!</button>
+                </form>
+                <script>
+                // $(function() {
+                //     $('#upload').submit(function(e) {
+                //         console.log('ok');
+                //         return false;
+                //     });
+
+                // });
+                </script>
+            </div>
+            {% endif %}
         </div>
     </div>
-</nav>
 {% endblock %}

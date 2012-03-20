@@ -25,8 +25,8 @@ from aacore import rdfutils
 import subprocess
 import os.path
 import feedparser
-from utils import get_rdf_model
 from textwrap import dedent
+from aacore import RDF_MODEL
 
 
 class AAFilter(object):
@@ -80,10 +80,8 @@ class AAFilterEmbed(AAFilter):
                   OPTIONAL {{ <%(URL)s> media:video_codec ?videocodec . }}
                 }}""".strip() % {'URL': self.stdin['original_url']})
 
-            model = get_rdf_model()
-
             b = {}
-            for row in rdfutils.query(q, model):
+            for row in rdfutils.query(q, RDF_MODEL):
                 for name in row:
                     b[name] = rdfutils.rdfnode(row.get(name))
                 break

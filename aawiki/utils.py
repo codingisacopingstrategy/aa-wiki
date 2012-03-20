@@ -24,7 +24,7 @@ import urllib
 import re
 import string
 from django.core.urlresolvers import reverse
-from aacore.utils import (get_rdf_model, add_resource)
+from aacore.utils import add_resource
 
 
 def url_for_pagename(name):

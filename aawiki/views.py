@@ -32,7 +32,7 @@ from aacore.models import (Namespace, Resource)
 
 from aawiki.filters import *
 from aawiki.models import *
-from aacore.utils import (get_rdf_model, add_resource)
+from aacore.utils import add_resource
 from aawiki.utils import (dewikify, convert_line_endings)
 from aawiki.mdx import get_markdown
 from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace, 
@@ -40,6 +40,7 @@ from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace,
 from aawiki.forms import (PageEditForm, AnnotationImportForm)
 from aawiki.audacity import audacity_to_srt
 from aawiki.timecode import timecode_tosecs
+from aacore import RDF_MODEL
 
 
 
@@ -50,10 +51,9 @@ def embed (request):
     """
     url = request.REQUEST.get("url")
     # ALLOW (authorized users) to trigger a resource to be added...
-    model = get_rdf_model()
     if url.startswith("http://"):
         # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
-        add_resource(url, model, request)
+        add_resource(url, RDF_MODEL, request)
 
     ### APPLY FILTERS (if any)
     pipeline = request.REQUEST.get("filter", "embed").strip()
@@ -181,6 +181,15 @@ def annotation_export(request, slug, section, _format="audacity",
                               mimetype="text/plain;charset=utf-8")
 
 
+@login_required
+def file_upload(request):
+    for f in request.FILES.getlist('file'):
+        destination = open('/home/aleray/work/aa.new/aa.wiki/run/media/uploads/%s' % f.name, 'wb+')
+        destination.write(f.file.read())
+        destination.close()
+    return HttpResponse("Seems like it worked!")
+
+
 def page_detail(request, slug):
     """
     Displays a :model:`aawiki.Page`.
@@ -213,6 +222,8 @@ def page_detail(request, slug):
     revision = request.REQUEST.get('rev')
     if revision:
         content = page.read(revision)
+        context['rev'] = revision
+        context['commit'] = page.get_commit(revision)
     else:
         content = page.content
 
@@ -296,6 +307,7 @@ def page_edit(request, slug):
                 context['page'] = page  # So templates nows about what page we are editing
                 context['form'] = PageEditForm(initial={"content": context['content']})
         else:
+            context['content'] = ''
             context['name'] = name  # So templates nows about what page we are editing
             rendered = render_to_string("aawiki/partials/initial_page_content.md", context)
             context['form'] = PageEditForm(initial={"content": rendered, "message": '/* Created a new page "%s" */' % name, })
@@ -310,7 +322,6 @@ def page_edit(request, slug):
 
         is_cancelled = request.POST.get('cancel', None)
         if is_cancelled:
-            #print('is_cancelled')
             url = reverse('aa-page-detail', kwargs={'slug': slug})
             return redirect(url)
 
@@ -323,7 +334,11 @@ def page_edit(request, slug):
             content = content.strip() + "\n\n" # Normalize whitespace around the markdown
             message = form.cleaned_data["message"] or "<no messages>"
             is_minor = form.cleaned_data["is_minor"]
-            author = "Anonymous <anonymous@%s>" % request.META['REMOTE_ADDR']
+            if request.user.is_authenticated():
+                author = "%s <%s@%s>" % (request.user.username, request.user.username, 
+                                         request.META['REMOTE_ADDR'])
+            else:
+                author = "Anonymous <anonymous@%s>" % request.META['REMOTE_ADDR']
 
             if page:
                 old_content = page.content
@@ -395,6 +410,7 @@ def page_history(request, slug):
         return redirect(url)
 
     context['page'] = page
+    context['content'] = page.content
 
     return render_to_response("aawiki/page_history.html", context,
             context_instance=RequestContext(request))
@@ -439,6 +455,8 @@ def page_diff(request, slug):
             #raise Http404
 
         context['content'] = page.diff(c1, c2)
+        context['c1'] = page.get_commit(c1)
+        context['c2'] = page.get_commit(c2)
 
     return render_to_response("aawiki/page_diff.html", context,
             context_instance=RequestContext(request))

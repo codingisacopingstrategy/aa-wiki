@@ -362,12 +362,16 @@ a[href^="http://"]:after            { content: "\2197"; color: gray; font-size: 
 /* sidebar {{{ */
 nav#sidebar {
     font-family: 'News Cycle';
-    line-height: 18px;
-    padding: 18px;
+    font-size: 13px;
+    line-height: 15px;
+    padding: 13px;
     overflow: hidden;
+    -moz-box-shadow: 3px 0 6px #DDD;
+    -webkit-box-shadow: 3px 0 6px #DDD;
+    box-shadow: 3px 0 6px #DDD;
 }
 nav#sidebar:hover {
-    overflow: auto;
+    /*overflow: auto;*/
 }
 nav#sidebar hgroup {
     border-top: 2px solid black;
@@ -378,7 +382,7 @@ nav#sidebar hgroup {
     padding-bottom: 18px;
 }
 nav#sidebar hgroup h1 {
-    font-size: 36px;
+    font-size: 32px;
     line-height: 36px;
 }
 nav#sidebar hgroup h2 {
@@ -417,12 +421,15 @@ ul#aa-tabs li a {
     text-indent: 18px;
 }
 #tab-help code {
-    font-size: 10px;
+    font-size: 9px;
+}
+#tab-help h2 {
+    border-top-color: lightgray;
 }
 #tab-help pre {
     border: 1px dotted black;
     margin-bottom: 18px;
-    padding: 8px;
+    padding: 4px;
 }
 #tab-layers li {
     border-bottom: 1px solid black;
@@ -575,7 +582,7 @@ section span.cancel {
 section:hover span.edit {
     display: block;
 }
-body.anonymous section:hover span.edit {
+body.locked section:hover span.edit {
     display: none;  /* hides the section edit link if user isn't logged in */
 }
 section span.edit:hover,
@@ -1064,10 +1071,10 @@ article.map div#wrapper {
 
 /* Accordion
 ----------------------------------*/
-.ui-accordion .ui-accordion-header.ui-state-default:before {
-    content: "\25B8 ";
-    margin-right: 0.25em;
-}
+/*.ui-accordion .ui-accordion-header.ui-state-default:before {*/
+    /*content: "\25B8 ";*/
+    /*margin-right: 0.25em;*/
+/*}*/
 .ui-accordion .ui-accordion-header {
   cursor: pointer;
   position: relative;
@@ -1076,7 +1083,7 @@ article.map div#wrapper {
   font-size: 13px;
   line-height: 18px;
   border-top: 1px solid black;
-  margin-bottom: 18px;
+  margin-bottom: 6px;
 }
 .ui-accordion .ui-accordion-li-fix {
   display: inline;
@@ -1147,3 +1154,17 @@ section.section1:hover                                    { z-index: 9999!import
 section.highlight                                         { z-index: 9999!important; }
 section.section1.editing                                  { z-index: 9999999; }
 /* }}} */
+
+.warning {
+    border: 3px solid yellow;
+    padding: 9px; 
+    margin-bottom: 18px; 
+    font-size: smaller;
+}
+
+#accordion h3 {
+    font-weight: bold;
+}
+#accordion h3 a {
+    text-decoration: none;
+}

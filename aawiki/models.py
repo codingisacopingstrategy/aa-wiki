@@ -98,7 +98,8 @@ class Page(models.Model):
         f.close()
 
         # Adds the newly creates files and commits
-        repo.index.add([self.slug,])
+        #repo.index.add([self.slug,])
+        repo.git.add([self.slug,])
         repo.git.commit(amend=amend, message=message, author=author)
 
         # Add the commit metadata in a git note, formatted as
@@ -114,6 +115,13 @@ class Page(models.Model):
 
         self.save()
         reindex_request.send(sender=self.__class__, instance=self)
+
+    def get_commit(self, rev="HEAD"):
+        """
+        Returns the commit object at a given revision
+        """
+        repo = self.get_repository()
+        return repo.commit(rev)
 
     def read(self, rev="HEAD"):
         """

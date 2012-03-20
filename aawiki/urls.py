@@ -10,6 +10,7 @@ urlpatterns = patterns('aawiki.views',
     url(r'^pages/(?P<slug>[-\w]+)/history/$', 'page_history', {}, name='aa-page-history'),
     url(r'^pages/(?P<slug>[-\w]+)/diff/$', 'page_diff', {}, name='aa-page-diff'),
     url(r'^pages/(?P<slug>[-\w]+)/flag/$', 'page_flag', {}, name='aa-page-flag'),
+    url(r'^upload/$', 'file_upload', {}, name='aa-file-upload'),
 
     ### Export
     url(r'^pages/(?P<slug>[^/]+)/annotations/(?P<section>\d+)/$', 'annotation_export', 
@@ -25,7 +26,7 @@ urlpatterns = patterns('aawiki.views',
 )
 
 ### LOGIN ###
-urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^accounts/login/$', 'login', {'template_name': 'aawiki/login.html'}, name='aa-login'),
-    url(r'^accounts/logout/$', 'logout', {'template_name': 'aawiki/logout.html'}, name='aa-logout'),
-)
+#urlpatterns += patterns('django.contrib.auth.views',
+    #url(r'^accounts/login/$', 'login', {'template_name': 'aawiki/login.html'}, name='aa-login'),
+    #url(r'^accounts/logout/$', 'logout', {'template_name': 'aawiki/logout.html'}, name='aa-logout'),
+#)

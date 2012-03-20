@@ -329,8 +329,9 @@
                 $(this).append(wrapped);
             }).bind("geometrychange", function (event) {
                 event.stopPropagation();
-                if (! $('body').hasClass('anonymous')) {
+                if (! $('body').hasClass('locked')) {
                     // Prevents anonymous users from recording the changes
+                    // Prevents recording changes on old revisions
                     commit_attributes(this);
                 }
             }).bind("edit", function (evt) {
@@ -622,24 +623,25 @@
             }
         });
 
-        $("#help").accordion({
+        $("#tab-help").accordion({
             autoHeight: false,
             collapsible: true
         });
 
-        $("#tab-this").tabs();
+        //$("#tab-this").tabs();
+        $("#accordion").accordion({ fillSpace: true });
 
         $('body').layout({
             applyDefaultStyles: false,
             enableCursorHotkey: false,
             west: {
-                size: "250",
+                size: "220",
                 fxName: "slide",
                 fxSpeed: "fast",
                 initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
-                closable: true,
+                closable: false,
                 resizable: false,
                 togglerAlign_closed : 'center',
                 togglerAlign_open : 'center',
@@ -649,9 +651,15 @@
                 spacing_open: 16,
                 togglerLength_open: -1,
                 togglerLength_closed: -1,
-                showOverflowOnHover: false
-            }
+                showOverflowOnHover: false,
+                onresize: function () {
+                    $('#accordion').accordion('resize');
+                }
+            },
         });
+
+        $('#accordion').accordion('resize');
+
         $('#center').layout({
             applyDefaultStyles: false,
             enableCursorHotkey: false,

@@ -1,9 +1,9 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
 from aacore.rdfutils import *
-from aacore.utils import get_rdf_model
 from aawiki.utils import (full_site_url, pagename_for_url)
 from aawiki.models import Page
+from aacore import RDF_MODEL
 
 class Command(BaseCommand):
     args = ''
@@ -17,14 +17,13 @@ class Command(BaseCommand):
 #        )
 
     def handle(self, *args, **options):
-        model = get_rdf_model()
         samplepageurl = full_site_url(Page.objects.all()[0].get_absolute_url())
         samplepageurl = samplepageurl.rstrip("/")
         basepageurl = samplepageurl[:samplepageurl.rindex('/')] + "/"
 
         pagenames = {}
         Page.objects.all()
-        for s in model:
+        for s in RDF_MODEL:
             obj = s.object
             if obj.is_resource():
                 url = unicode(obj.uri)

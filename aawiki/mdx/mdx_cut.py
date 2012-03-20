@@ -22,8 +22,20 @@
     ... This is another one
     ... '''
     >>> html = markdown.markdown(txt, extensions=['cut'])
-    >>> html.replace("\\n", "")
-    u'<p>This is preliminary content</p><section><h1>This is my first section</h1><p>This is some additional content</p><h2>This is another one</h2></section><section><ul><li>This is my first section</li><li>This is some additional content</li></ul><p>This is another one</p></section>'
+    >>> print(html)
+    <p>This is preliminary content</p>
+    <section>
+    <h1>This is my first section</h1>
+    <p>This is some additional content</p>
+    <h2>This is another one</h2>
+    </section>
+    <section>
+    <ul>
+    <li>This is my first section</li>
+    <li>This is some additional content</li>
+    </ul>
+    <p>This is another one</p>
+    </section>
 """
 
 

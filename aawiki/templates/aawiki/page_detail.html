@@ -1,11 +1,10 @@
-{% extends "aawiki/base_wiki.html" %}
+{% extends "aawiki/base.html" %}
 
 {% load aacoretags aawikitags typogrify_tags %}
 
 {% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
 
 {% block extrahead %}
-
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
 <script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
 
@@ -27,6 +26,7 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.styles.play.css" media="screen"/>
 
 {% get_markdown_for content as md meta %}
+
 {% for css in meta.extra_css %}
 <link rel="stylesheet" href="{{ css }}" media="screen"/>
 {% endfor %}
@@ -34,7 +34,6 @@
 
 
 {% block body %}
-{% get_markdown_for content as md meta %}
 <nav id="timeline" class="ui-layout-north">
     <nav id="controls">
         <span id="playpause">play</span>
@@ -48,7 +47,7 @@
             {% endspaceless %}
         </form>
     </nav>
-<div id="timelineslider"></div>
+    <div id="timelineslider"></div>
 </nav>
 
 <iframe id="browser-panel" class="ui-layout-south"></iframe>
@@ -56,21 +55,110 @@
 <article id="canvas" class="ui-layout-center
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}
                             {% if meta.type %}{{ meta.type|first }}{% endif %}">
-    <div id="wrapper">
-    {{ md|render_aatags|safe|typogrify }}
-    </div>
+
+    <div id="wrapper">{{ md|render_aatags|safe|typogrify }}</div>
 
     <nav id="zoom">
     <button id="zoomin">+</button>
     <div id="zoomslider"></div>
     <button id="zoomout">-</button>
     </nav>
-
 </article>
-
 {% endblock %}
 
 
-{% block postbody %}
-{% include "aawiki/partials/sidebar.html" %}
+{% block extrasidebar %}
+    {% if page %}
+    {% if user.is_authenticated %}
+    <ul id="toolbar">
+        {% if rev %}
+        <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+        {% endif %}
+        <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+        <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+        <li><a id="add" title="Add an annotation" href="#">Add</a></li>
+        <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
+    </ul>
+    {% endif %}
+    {% endif %}
+    <hgroup>
+    {% if meta.title %}
+        <h1 property="dc:title">{{ meta.title|first }}</h1>
+    {% else %}
+        <h1 property="dc:title">{{ page.name }}</h1>
+    {% endif %}
+
+    {% if meta.subtitle %}
+        <h2>{{ meta.subtitle|first }}</h2>
+    {% endif %}
+    </hgroup>
+    {% if rev %}
+    <br />
+    <p class="warning">This is an old revision of this page, as edited by {{ commit.author }} at {{ commit.committed_date|epock2datetime }}. It may differ significantly from the <a href="{{ page.get_absolute_url }}">current revision</a>.</p>
+    {% endif %}
+    <div class="ui-layout-content">
+        <div id="accordion">
+            <h3><a href="#">Introduction</a></h3>
+            <div>
+                <div>
+                {% if meta.ispartof %}
+                <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
+                {% for publication in meta.ispartof %}
+                “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
+                {% endfor %}
+                {% endif %}
+
+                {% if meta.with %}<p>With {{ meta.with|join:', ' }}.</p>{% endif %}
+                {% if meta.editedby %}<p>Edited by {{ meta.editedby|join:', ' }}.</p>{% endif %}
+                {% if meta.authors %}
+                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
+                {% endif %}
+                </div>
+
+                {% for summary in meta.summary %}
+                {% get_markdown_for summary as md meta %}
+                {{ md|safe }}
+                {% endfor %}
+            </div>
+            
+            <h3><a href="#">Annotations</a></h3>
+            <div id="tab-layers" class="aa-tab"></div>
+
+            {% if user.is_authenticated %}
+            {% if not rev %}
+
+            <h3><a href="#">Styles</a></h3>
+            <div id="tab-styles" class="aa-tab">
+            {% include "aawiki/partials/swatches.html" %}
+            </div>
+            {% endif %}
+
+            <h3><a href="#">Help</a></h3>
+            <div id="tab-help">
+                {% include "aawiki/partials/metadata_help.html" %}
+                {% include "aawiki/partials/timecode_help.html" %}
+                {% include "aawiki/partials/filters_help.html" %}
+                {% include "aawiki/partials/markdown_help.html" %}
+            </div>
+
+            <h3><a href="#">Upload</a></h3>
+            <div id="tab-upload">
+                <form id="upload" action="/upload/" method="post" enctype="multipart/form-data">{% csrf_token %}
+                    <input type="file" value="" name="file" multiple />
+                    <button type="submit">Upload!</button>
+                </form>
+                <script>
+                // $(function() {
+                //     $('#upload').submit(function(e) {
+                //         console.log('ok');
+                //         return false;
+                //     });
+
+                // });
+                </script>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
 {% endblock %}

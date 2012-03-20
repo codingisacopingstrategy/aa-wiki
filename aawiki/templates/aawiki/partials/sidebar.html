@@ -14,9 +14,9 @@
     <div id="login">
         <p>
         {% if user.is_authenticated %}
-        Welcome {{ user }} | <a title="Logout" href="{% url aa-logout %}?next={{ page.get_absolute_url }}">Logout</a>
+        Welcome {{ user }} | <a title="Logout" href="{% url aa_logout %}?next={{ page.get_absolute_url }}">Logout</a>
         {% else %}
-            <a title="Login" href="{% url aa-login %}?next={{ page.get_absolute_url }}">Login</a>
+            <a title="Login" href="{% url auth_login %}?next={{ page.get_absolute_url }}">Login</a>
         {% endif %}
         </p>
     </div>

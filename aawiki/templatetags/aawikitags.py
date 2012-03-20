@@ -52,11 +52,14 @@ class MarkdownConvertor(template.Node):
     def render(self, context):
         md = get_markdown()
         html = md.convert(self.value.resolve(context))
-        context[self.var_name] = html
+        # We use context.dicts[0] instead of context in order to access the
+        # variables in any template blocks
+        # See http://od-eon.com/blogs/liviu/scope-variables-template-blocks/
+        context.dicts[0][self.var_name] = html
         if hasattr(md, "Meta"):
-            context[self.meta_name] = md.Meta
+            context.dicts[0][self.meta_name] = md.Meta
         else:
-            context[self.meta_name] = {}
+            context.dicts[0][self.meta_name] = {}
         return ''
 
 def do_get_markdown_for(parser, token):

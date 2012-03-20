@@ -1,26 +1,52 @@
-{% extends "aawiki/base_wiki.html" %}
+{% extends "aawiki/base.html" %}
 
-{% load aacoretags %}
+{% load aacoretags aawikitags %}
 
 {% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
 
 {% block extrahead %}
-<script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
-<script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
+<script>
+(function($) {
+    $(document).ready(function() {
+        $("#help").accordion({
+            autoHeight: false,
+            collapsible: true
+        });
 
-<script src="{{ STATIC_URL }}aawiki/js/jquery.sort_by_zindex.js"></script>   
-<script src="{{ STATIC_URL }}aawiki/js/jquery.caret.js"></script>   
-<script src="{{ STATIC_URL }}aawiki/js/jquery.aalayers.js"></script>   
-<script src="{{ STATIC_URL }}aawiki/js/jquery.datetimecode.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.timeline.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.voidplayer.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.ui.autoscrollable.js"></script>
+        // $("#tab-this").tabs();
+        $("#accordion").accordion({ fillSpace: true });
 
-<script src="{{ STATIC_URL }}aawiki/js/jquery.ffind.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/aa.view.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/aa.browser.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/embed.js"></script>
-<script src="{{ STATIC_URL }}lib/iscroll/src/iscroll.js"></script>
+        $('body').layout({
+            applyDefaultStyles: false,
+            enableCursorHotkey: false,
+            west: {
+                size: "220",
+                fxName: "slide",
+                fxSpeed: "fast",
+                initClosed: false,
+                enableCursorHotkey: false,
+                slidable: false,
+                closable: false,
+                resizable: false,
+                togglerAlign_closed : 'center',
+                togglerAlign_open : 'center',
+                togglerContent_open: '&larr;',
+                togglerContent_closed: '&rarr;',
+                spacing_closed: 16,
+                spacing_open: 16,
+                togglerLength_open: -1,
+                togglerLength_closed: -1,
+                showOverflowOnHover: false,
+                onresize: function () {
+                    $('#accordion').accordion('resize');
+                }
+            }
+        });
+
+        $('#accordion').accordion('resize');
+    });
+})(jQuery);
+</script>
 {% endblock %}
 
 
@@ -33,38 +59,18 @@
 {% endblock %}
 
 
-{% block postbody %}
-<nav id="sidebar" class="ui-layout-west"> 
-    <div id="login">
-        {% if user.is_authenticated %}
-            <a title="Logout" href="{% url aa-logout %}">Logout</a>
-        {% else %}
-            <a title="Login" href="{% url aa-login %}">Login</a>
-        {% endif %}
-    </div>
-    <div>
-    <!--<h1 class="logo">-->
-        <!--[><a title="Back to main page" href="{% url aa-index %}"><]-->
-            <!--[><span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span><]-->
-        <!--[></a><]-->
-        <!--<a title="Back to main page" href="{% url aa-index %}">-->
-            <!--Oralsite-->
-        <!--</a>-->
-    <!--</h1>-->
-    <!--<p><a title="About Oral Site" href="{% url aa-page-detail 'Oral_Site' %}">About</a></p>-->
-    <!--<hr>-->
+{% block extrasidebar %}
         {% if page %}
             {% if user.is_authenticated %}
                 <ul id="toolbar">
                     <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
                     <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
-                    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
                 </ul>
             {% endif %}
         {% endif %}
-
         <header>
             <hgroup>
+                <p>Comparing revisions</p>
                 {% if meta.title %}
                     <h1>{{ meta.title|first }}</h1>
                 {% else %}
@@ -74,27 +80,10 @@
                     <h2>{{ meta.subtitle|first }}</h2>
                 {% endif %}
             </hgroup>
-
-            {% if meta.ispartof %}
-            <p>This page is part of the publication{{ meta.ispartof|pluralize }} {{ meta.ispartof|join:"," }}.</p>
-            {% endif %}
         </header>
-    </div>
-
-    <div id="tab-this">
-        <ul id="aa-tabs">
-            <li><a title="Help" href="#tab-help">Help</a></li>
-        </ul>
-
-        <div id="tab-help" class="aa-tab">
-            <div id="help">
-            {% include "aawiki/partials/playmode_classes_help.html" %}
-            {% include "aawiki/partials/metadata_help.html" %}
-            {% include "aawiki/partials/timecode_help.html" %}
-            {% include "aawiki/partials/filters_help.html" %}
-            {% include "aawiki/partials/markdown_help.html" %}
-            </div>
+        <div>
+            <br />
+            <p class="warning">This is an comparision of two revisions of this page, as edited by {{ c1.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c1 }}">{{ c1.committed_date|epock2datetime }}</a >and as edited by {{ c2.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c2 }}">{{ c2.committed_date|epock2datetime }}</a>.</p>
+            <p><del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.</p>
         </div>
-    </div>
-</nav>
 {% endblock %}

@@ -1,15 +1,42 @@
-{% extends "aawiki/base_wiki.html" %}
+{% extends "aawiki/base.html" %}
+
+{% load aacoretags aawikitags %}
+
+{% block extrahead %}
+<script>
+(function($) {
+    $(document).ready(function() {
+        $('body').layout({
+            applyDefaultStyles: false,
+            enableCursorHotkey: false,
+            west: {
+                size: "250",
+                fxName: "slide",
+                fxSpeed: "fast",
+                initClosed: false,
+                enableCursorHotkey: false,
+                slidable: false,
+                closable: false,
+                resizable: false,
+                togglerAlign_closed : 'center',
+                togglerAlign_open : 'center',
+                togglerContent_open: '&larr;',
+                togglerContent_closed: '&rarr;',
+                spacing_closed: 16,
+                spacing_open: 16,
+                togglerLength_open: -1,
+                togglerLength_closed: -1,
+                showOverflowOnHover: false
+            }
+        });
+    });
+})(jQuery);
+</script>
+{% endblock %}
 
 
 {% block body %}
 <nav id="west-pane" > 
-    <h1 class="logo">
-        <a title="Back to main page" href="{% url aa-index %}">
-            <span>O</span><span>r</span><span>a</span><span>l</span><span>S</span><span>i</span><span>t</span><span>e</span>
-        </a>
-    </h1>
-    <h2>Log in Oral Site</h2>
-
     {% if form.errors %}
         <div class="section"> <!-- div Anonymous -->
             <p style='color: blue;'>Your username and password don't match. Please try again.</p>
@@ -26,3 +53,8 @@
 </nav>
 {% endblock %}
 
+{% block extrasidebar %}
+    <hgroup>
+        <h1 property="dc:title">User log in</h1>
+    </hgroup>
+{% endblock %}

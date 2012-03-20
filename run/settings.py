@@ -53,6 +53,7 @@ MEDIA_ROOT = os.path.join(DIRNAME, 'media/')
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/media/'
+STATIC_ROOT= os.path.join(DIRNAME, 'static/')
 STATIC_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
@@ -84,6 +85,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.join(DIRNAME, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -96,6 +98,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django.contrib.markup',
     'django.contrib.staticfiles',
+    'registration',
     'typogrify',
     'aacore',
     'flickr',
@@ -103,7 +106,7 @@ INSTALLED_APPS = (
     'ffmpeg',
     'internetarchive',
     'aawiki',
-
+    #'uploadify',
 )
 
 ###################
@@ -114,3 +117,11 @@ AA_RDF_STORAGE_DIR = DIRNAME
 AA_INDEXED_MODELS = ("aacore.models.Resource", "aawiki.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
 # SITE_URL = "http://localhost:8000"
 
+ACCOUNT_ACTIVATION_DAYS = 7
+if DEBUG:
+    #EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+
+# Upload path that files are sent to
+#UPLOADIFY_UPLOAD_PATH = '%s%s' % (STATIC_ROOT, 'uploads/')

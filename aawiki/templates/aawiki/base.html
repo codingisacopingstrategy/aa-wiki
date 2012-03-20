@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    {% for ns in namespaces %}
+    xmlns:{{ ns.name }}="{{ ns.url }}"
+    {% endfor %}
+    version="HTML+RDFa 1.1">
+
+<head>
+{% block head %}
+    <meta charset="utf-8"/>
+    <link rel="index" href="{% url aa-index %}"/>
+    <title>{% block title %}active archives{% endblock %}</title>
+    <link href='http://fonts.googleapis.com/css?family=News+Cycle' rel='stylesheet' type='text/css'/>
+    <link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'/>
+    <link rel="stylesheet" href="{% url aa-namespaces-css %}" media="screen" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/activearchives.css" type="text/css"/>
+    <link rel="aa-embed" href="{% url aa-embed %}" type="text/css"/>
+    <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.1.min.js"></script>
+    <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.17.custom.min.js"></script>    
+    <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
+    <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
+    <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/jquery.layout.css" type="text/css"/>
+    {% block extrahead %}{% endblock %}
+{% endblock head %}
+</head>
+
+<body{% if not user.is_authenticated or rev %} class="locked"{% endif %}>
+    {% block prebody %}{% endblock %}
+
+    <div id="center" class="ui-layout-center"> 
+    {% block body %}{% endblock body %} 
+    </div>
+
+    <nav id="sidebar" class="ui-layout-west"> 
+        <!--<p><a title="Back to main page" href="{% url aa-index %}">Oralsite</a></p>-->
+        <div id="login">
+            <p>
+            {% if user.is_authenticated %}
+            Welcome {{ user }} | <a title="Logout" href="{% url auth_logout %}?next={{ page.get_absolute_url }}">Logout</a>
+            {% else %}
+                <a title="Login" href="{% url auth_login %}?next={{ page.get_absolute_url }}">Login</a>
+            {% endif %}
+            </p>
+        </div>
+        {% block extrasidebar %}{% endblock %}
+    </nav>
+    </body>
+</html>

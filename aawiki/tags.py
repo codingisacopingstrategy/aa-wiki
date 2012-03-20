@@ -1,5 +1,5 @@
 """
-Code is derived from
+Code is derived fro/mm
 http://effbot.org/zone/django-simple-template.htm
 """
 
@@ -10,6 +10,7 @@ from aawiki.utils import dewikify
 import aacore.utils 
 from aacore.rdfutils import query
 from urlparse import urlparse
+from aacore import RDF_MODEL
 
 
 def render_tpl(template):
@@ -70,7 +71,6 @@ class AASparql(AATag):
     name = "sparql"
 
     def run(self):
-        m = aacore.utils.get_rdf_model()
         return "ok"
 
 
@@ -78,14 +78,13 @@ class AAPageList(AATag):
     name = "pagelist"
 
     def run(self):
-        m = aacore.utils.get_rdf_model()
 
         ret = query("""\
                 SELECT DISTINCT ?url ?title 
                 WHERE { 
                     ?url <http://www.w3.org/1999/xhtml/vocab#index> ?c. 
                     ?url <http://purl.org/dc/elements/1.1/title> ?title. 
-                }""", m)
+                }""", RDF_MODEL)
 
         foo = ["<ul>"]
         for i in ret:
@@ -99,11 +98,10 @@ class AAAnnotations(AATag):
     name = "annotations"
 
     def run(self):
-        m = aacore.utils.get_rdf_model()
         ret = query("""
                 SELECT ?a WHERE { 
                     <http://www.lemonde.fr/> <http://activearchives.org/terms/annotation> ?a . 
-                }""", m)
+                }""", RDF_MODEL)
         foo = []
         for i in ret:
             foo.append("<section class='section2'>%s</section>" % str(i['a']))
