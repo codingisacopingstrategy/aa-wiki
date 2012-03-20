@@ -123,5 +123,6 @@ if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
     EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
+AA_UPLOAD_DIR = os.path.join(MEDIA_ROOT, 'uploads')
 # Upload path that files are sent to
 #UPLOADIFY_UPLOAD_PATH = '%s%s' % (STATIC_ROOT, 'uploads/')

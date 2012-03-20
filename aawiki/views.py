@@ -184,7 +184,7 @@ def annotation_export(request, slug, section, _format="audacity",
 @login_required
 def file_upload(request):
     for f in request.FILES.getlist('file'):
-        destination = open('/home/aleray/work/aa.new/aa.wiki/run/media/uploads/%s' % f.name, 'wb+')
+        destination = open(os.path.join(settings.AA_UPLOAD_DIR, f.name), 'wb+')
         destination.write(f.file.read())
         destination.close()
     return HttpResponse("Seems like it worked!")
