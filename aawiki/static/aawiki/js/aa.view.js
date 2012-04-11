@@ -243,9 +243,9 @@
 
         /* Hides the slider if there is no titles attached to the body */
         if ($('body').timeline('maxTime') === undefined) {
-            $('#timeline, #time, #playpause').hide();
+            $('#timelineslider, #time, #playpause').hide();
         } else {
-            $('#timeline, #time, #playpause').show();
+            $('#timelineslider, #time, #playpause').show();
         }
     }
 
