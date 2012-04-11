@@ -49,7 +49,7 @@
     <div id="timelineslider"></div>
 </nav>
 
-<iframe id="browser-panel" class="ui-layout-south"></iframe>
+<iframe id="browser-panel" class="ui-layout-south" src="{% url aacore.views.browse %}"></iframe>
 
 <article id="canvas" class="ui-layout-center
                             {% if meta.mode %}{{ meta.mode|first }}{% endif %}
