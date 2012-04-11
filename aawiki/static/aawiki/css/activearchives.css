@@ -151,6 +151,17 @@ marquee                                                     { overflow: visible;
     font-style: normal;
 
 }
+@font-face {
+    font-family: 'News Cycle';
+    src: url('/static/lib/fonts/NewsCycle-Regular-webfont.eot');
+    src: url('/static/lib/fonts/NewsCycle-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.woff') format('woff'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.ttf') format('truetype'),
+         url('/static/lib/fonts/NewsCycle-Regular-webfont.svg#NewsCycleRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
 /* }}} */
 
 
