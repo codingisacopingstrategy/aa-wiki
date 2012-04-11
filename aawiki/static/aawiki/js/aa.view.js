@@ -821,18 +821,26 @@
             }
         });
         
-        $('a[href^="#"]').live('click', function() {
-            var $target = $($(this).attr('href'));
-            var offset = $target.offset();
+        $('#tab-layers a[href^="#"]').live('click', function() {
+            var $target,
+                offset;
+        
+            $target = $($(this).attr('href'));
+
+            if (! $target.parents("#canvas").length) {
+                return true;
+            }
+
+            offset = $target.position();
             //var container_offset = $('div#center').offset();
             
             $canvas.animate({
-                scrollTop: offset.top,
-                scrollLeft: offset.left
+                scrollTop: $canvas.scrollTop() + offset.top - 20,
+                scrollLeft: $canvas.scrollLeft() + offset.left - 20
             }, 1000);
 
             $target.removeClass('collapsed');
-            $target.trigger("geometrychange");
+            //$target.trigger("geometrychange");
             return false;
         });
 
