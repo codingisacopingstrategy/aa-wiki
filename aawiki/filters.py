@@ -176,6 +176,29 @@ class AAFilterBW(AAFilter):
         self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
 
 
+class AAFilterRotate(AAFilter):
+    name = "rotate"
+
+    def validate(self):
+        degreespat = re.compile(r"(?P<degrees>\d+)", re.I)
+        match = degreespat.match(self.arguments)
+        if match:
+            self.parsed_arguments['degrees'] = match.groupdict()['degrees']
+            return True
+
+    def run(self):
+        if not os.path.exists(self.stdout['local_path']):
+            cmd = 'convert -rotate %s %s %s' % (self.parsed_arguments['degrees'], 
+                                                self.stdin['local_path'], 
+                                                self.stdout['local_path'])
+            p1 = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE, 
+                                  stdin=subprocess.PIPE)
+            #(stdout_data, stderr_data) = p1.communicate(input=self.stdin)
+            (stdout_data, stderr_data) = p1.communicate()
+
+        self.stdout['output'] = "Conversion successful. Use the embed filter to display your ressource in the page"
+
+
 class AAFilterResize(AAFilter):
     name = "resize"
 
