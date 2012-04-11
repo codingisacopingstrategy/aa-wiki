@@ -712,13 +712,21 @@
         $("#mode").buttonset();
         $("#playpause, #time").button();
 
-        $("#modeedit, #modeplay").change(function() {
-            var mode = $(this).val();
-            if (mode == "play") {
-                $("article").addClass("play");
+        $("#mode input").change(function() {
+            var classes = [],
+                mode = $(this).val();
+
+            $(this).parent().find('input').each(function(i, selected) {
+                classes[i] = $(selected).val();
+            });
+
+            classes = classes.join(' ').replace(mode, '');
+
+            $canvas.removeClass(classes).addClass(mode);
+
+            if (mode == "cinematic") {
                 $("body").layout().close("west");
             } else {
-                $("article").removeClass("play");
                 $("body").layout().open("west");
             }
         });

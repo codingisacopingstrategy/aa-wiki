@@ -1,64 +1,64 @@
-article.play section.section1.hidden {
+article.cinematic section.section1.hidden {
     display: none!important;
 }
-article.play section.section1.alignbottom section.section2.active {
+article.cinematic section.section1.alignbottom section.section2.active {
     vertical-align: bottom!important;
 }
-article.play section.section1.aligntop section.section2.active {
+article.cinematic section.section1.aligntop section.section2.active {
     vertical-align: top!important;
 }
-article.play section.section1.top section.section2 {
+article.cinematic section.section1.top section.section2 {
     vertical-align: top;
 }
-article.play section.section1.xx-large * {
+article.cinematic section.section1.xx-large * {
     font-size: xx-large;
     line-height: 1.1;
 }
-article.play section.section1 {
+article.cinematic section.section1 {
     background-color: transparent;
     overflow: hidden;
 }
-article.play section.section1.collapsed {
+article.cinematic section.section1.collapsed {
     /*visibility: hidden;*/
 }
-article.play section.section1.tm {
+article.cinematic section.section1.tm {
     position: absolute;
     top: 0!important;
     left: 50%!important;
 }
-article.play section.section1.tl {
+article.cinematic section.section1.tl {
     position: absolute;
     top: 0!important;
     left: 0!important;
 }
-article.play section.section1.ml {
+article.cinematic section.section1.ml {
     position: absolute;
     top: 50%!important;
     left: 0!important;
 }
-article.play section.section1.mm {
+article.cinematic section.section1.mm {
     position: absolute;
     top: 50%!important;
     left: 50%!important;
 }
 
-article.play section.section1.width50 {
+article.cinematic section.section1.width50 {
     width: 50%!important;
 }
-article.play section.section1.height50 {
+article.cinematic section.section1.height50 {
     height: 50%!important;
 }
-article.play section.section1.width100 {
+article.cinematic section.section1.width100 {
     width: 100%!important;
 }
-article.play section.section1.height100 {
+article.cinematic section.section1.height100 {
     height: 100%!important;
 }
 
-article.play section.section1 h1 {
+article.cinematic section.section1 h1 {
     display: none;
 }
-article.play section.section1 {
+article.cinematic section.section1 {
     border: none;
     /*border: 1px solid red;*/
     /*box-sizing: border-box;*/
@@ -67,7 +67,7 @@ article.play section.section1 {
     /*-ms-box-sizing: border-box;*/
     /*outline: 0px none transparent;*/
 }
-article.play section.section2 {
+article.cinematic section.section2 {
     border: none;
     /*border: 1px solid blue;*/
     /*box-sizing: border-box;*/
@@ -76,7 +76,7 @@ article.play section.section2 {
     /*-ms-box-sizing: border-box;*/
     /*outline: 0px none transparent;*/
 }
-article.play section.section2 h2 {
+article.cinematic section.section2 h2 {
     display: none;
 }
 /*.showtimecodes h2 {*/
@@ -84,13 +84,13 @@ article.play section.section2 h2 {
 /*}*/
 
 
-/*article.play section.section2 img {*/
+/*article.cinematic section.section2 img {*/
     /*opacity: 0;*/
 /*}*/
-/*article.play section.section2.active img {*/
+/*article.cinematic section.section2.active img {*/
     /*opacity: 100;*/
 /*}*/
-/*article.play section.section2.active img {*/
+/*article.cinematic section.section2.active img {*/
     /*-webkit-transition: opacity 1s ease-in-out;*/
 	/*-moz-transition: opacity 1s ease-in-out;*/
 	/*-o-transition: opacity 1s ease-in-out;*/
@@ -99,14 +99,14 @@ article.play section.section2 h2 {
 /*}*/
 
 
-article.play section.section2.active {
+article.cinematic section.section2.active {
     background: none;
     display: block;
 }
-article.play section.section2 {
+article.cinematic section.section2 {
     display: none;
 }
-article.play .active div.wrapper {
+article.cinematic .active div.wrapper {
       -moz-animation-duration: 2s;
       -webkit-animation-duration: 2s;
       -moz-animation-name: slidein;
@@ -132,10 +132,10 @@ article.play .active div.wrapper {
     opacity: 1;
   }
 }
-article.play section.section2 {
+article.cinematic section.section2 {
     border-top: none!important;
 }
-article.play .ui-resizable-handle {
+article.cinematic .ui-resizable-handle {
     display: none!important;
 }
 
@@ -165,10 +165,10 @@ section.section1.center section.section2.active {
     /*padding: 30px;*/
 }
 
-article.play del {
+article.cinematic del {
     visibility: hidden;
 }
-article.play .big {
+article.cinematic .big {
     font-size: 56px;
 }
 @-webkit-keyframes blinker {  
