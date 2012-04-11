@@ -62,6 +62,7 @@
             + "</form>"
         ).find('ul').sortable({
             axis: 'y',
+            distance: 5,
             stop : function(event, ui) {
                 data.post_reorder.apply(data.$container, [event, ui, data]);
             },
@@ -88,6 +89,7 @@
                 //var $label = $('<label>').attr('for', 'name').append(
                         //$('a').attr('href', '#' + $this.attr('id')).text($h1.text())
                     //);
+
 
                 var export_link = $("<a>").text("⤍ ")
                     .attr('title', 'export to audacity markers')

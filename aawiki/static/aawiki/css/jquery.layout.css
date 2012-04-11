@@ -59,19 +59,19 @@
         otherwise color shifts while dragging when bar can't keep up with mouse */
     .ui-layout-resizer-open-hover , /* hover-color to 'resize' */
     .ui-layout-resizer-dragging {   /* resizer beging 'dragging' */
-        background: #C4E1A4;
+        /*background: #C4E1A4;*/
     }
     .ui-layout-resizer-dragging {   /* CLONED resizer being dragged */
-        border-left:  1px solid #BBB;
-        border-right: 1px solid #BBB;
+        /*border-left:  1px solid #BBB;*/
+        /*border-right: 1px solid #BBB;*/
     }
     /* NOTE: Add a 'dragging-limit' color to provide visual feedback when resizer hits min/max size limits */
     .ui-layout-resizer-dragging-limit { /* CLONED resizer at min or max size-limit */
-        background: #E1A4A4; /* red */
+        /*background: #E1A4A4; [> red <]*/
     }
 
     .ui-layout-resizer-closed-hover { /* hover-color to 'slide open' */
-        background: #EBD5AA;
+        /*background: #EBD5AA;*/
     }
     .ui-layout-resizer-sliding {    /* resizer when pane is 'slid open' */
         opacity: .10; /* show only a slight shadow */

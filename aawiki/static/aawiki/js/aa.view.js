@@ -623,7 +623,7 @@
             }
         });
 
-        $("#tab-help").accordion({
+        $("body").not('.locked').find('#tab-help').accordion({
             autoHeight: false,
             collapsible: true
         });
@@ -636,28 +636,28 @@
             enableCursorHotkey: false,
             west: {
                 size: "220",
-                fxName: "slide",
+                fxName: "none",
                 fxSpeed: "fast",
                 initClosed: false,
                 enableCursorHotkey: false,
                 slidable: false,
-                closable: false,
+                closable: true,
                 resizable: false,
-                togglerAlign_closed : 'center',
-                togglerAlign_open : 'center',
-                togglerContent_open: '&larr;',
-                togglerContent_closed: '&rarr;',
-                spacing_closed: 16,
-                spacing_open: 16,
-                togglerLength_open: -1,
-                togglerLength_closed: -1,
+                togglerAlign_closed : 5,
+                togglerAlign_open : 5,
+                togglerContent_open: '&times;',
+                togglerContent_closed: '+',
+                spacing_closed: 13,
+                spacing_open: 13,
+                togglerLength_open: 9,
+                togglerLength_closed: 9,
                 showOverflowOnHover: false,
                 onresize: function () {
                     $('#accordion').accordion('resize');
                 }
             },
         });
-
+        
         $('#accordion').accordion('resize');
 
         $('#center').layout({
@@ -666,23 +666,44 @@
             slidable: false,
             resizable: false,
             closable: false,
+            north: {
+                fxName: "none",
+                //initClosed: true,
+                //enableCursorHotkey: false,
+                //slidable: false,
+                //closable: true,
+                //resizable: false,
+                togglerAlign_closed : 5,
+                togglerAlign_open : 5,
+                togglerAlign_closed : 'right',
+                togglerAlign_open : 'right',
+                togglerContent_open: '&times',
+                togglerContent_closed: '+',
+                spacing_closed: 13,
+                spacing_open: 13,
+                togglerLength_open: 13,
+                togglerLength_closed: 13,
+                showOverflowOnHover: false
+            },
             south: {
                 size: "250",
-                fxName: "slide",
+                fxName: "none",
                 fxSpeed: "fast",
                 initClosed: true,
                 enableCursorHotkey: false,
                 slidable: true,
                 closable: true,
                 resizable: true,
-                togglerAlign_closed : 'center',
-                togglerAlign_open : 'center',
-                togglerContent_open: '&darr;',
-                togglerContent_closed: '&uarr;',
-                spacing_closed: 0,
-                spacing_open: 18,
-                togglerLength_open: -1,
-                togglerLength_closed: -1,
+                togglerAlign_closed : 5,
+                togglerAlign_open : 5,
+                togglerAlign_closed : 'right',
+                togglerAlign_open : 'right',
+                togglerContent_open: '&times',
+                togglerContent_closed: '+',
+                spacing_closed: 13,
+                spacing_open: 13,
+                togglerLength_open: 13,
+                togglerLength_closed: 13,
                 showOverflowOnHover: false
             }
         });

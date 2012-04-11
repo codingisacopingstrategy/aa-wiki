@@ -171,7 +171,7 @@ h4, h5, h6                                      { font-weight: bold; }
 b, strong, caption, th, thead, dt, legend       { font-weight: bold; }
 cite, dfn, em, i                                { font-style: italic; }
 textarea, code, kbd, samp, pre, tt, var         { font-family: mono-space, monospace; }
-h1, h2, h3, h4, h5, h6                          { word-spacing: -0.125em; }
+/*h1, h2, h3, h4, h5, h6                          { word-spacing: -0.125em; }*/
 p                                               { word-spacing: 0.125em; hyphenate: auto; hyphenate-lines: 3; }
 pre, code                                       { white-space: pre; }
 del                                             { text-decoration: line-through; }
@@ -374,20 +374,29 @@ a[href^="http://"]:after            { content: "\2197"; color: gray; font-size: 
 nav#sidebar {
     font-family: 'News Cycle';
     font-size: 13px;
-    line-height: 15px;
-    padding: 13px;
+    line-height: 18px;
+    padding: 13px 0 13px 13px;
     overflow: hidden;
+}
+
+#site-name {
+    margin-bottom: 9px;
+}
+
+.ui-layout-resizer-west-open {
     -moz-box-shadow: 3px 0 6px #DDD;
     -webkit-box-shadow: 3px 0 6px #DDD;
     box-shadow: 3px 0 6px #DDD;
+
 }
+
 nav#sidebar:hover {
     /*overflow: auto;*/
 }
 nav#sidebar hgroup {
     border-top: 2px solid black;
     border-bottom: 2px solid black;
-    margin: -2px 0 -2px 0;
+    margin: -2px 0;
     position: relative;
     top: 5px;
     padding-bottom: 18px;
@@ -403,11 +412,14 @@ nav#sidebar hgroup h2 {
 nav#sidebar div#login,
 ul#aa-tabs,
 ul#toolbar {
-    margin: 9px 0;
+    margin: 0 0 9px 0;
     line-height: 9px;
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.25px;
+}
+nav#sidebar div#login {
+    margin: 0 0 9px 0;
 }
 ul#toolbar li,
 ul#aa-tabs li {
@@ -429,7 +441,7 @@ ul#aa-tabs li a {
     text-decoration: none;
 }
 #tab-about p + p {
-    text-indent: 18px;
+    margin-top: 18px;
 }
 #tab-help code {
     font-size: 9px;
@@ -455,6 +467,9 @@ ul#aa-tabs li a {
 
 
 /* Canvas {{{ */
+article#canvas {
+    margin-left: 50px;
+}
 article#canvas.map {
     overflow: hidden !important;
 }
@@ -589,6 +604,7 @@ section span.cancel {
     color: gray;
     float: right;
     position: relative;
+    font-size: 13px;
 }
 section:hover span.edit {
     display: block;
@@ -863,6 +879,9 @@ span.swatch select {
 #tab-layers li:before {
     content: "";
 }
+#tab-layers a {
+    text-decoration: none;
+}
 /* }}} */
 
 /* tags {{{ */
@@ -876,17 +895,17 @@ span[property="foaf:person"] {
 /*h1.logo {*/
 span.content.content-open,
 span.content.content-closed {
-    padding-bottom: 0;
-    width: 16px;
-    height: 16px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 16px;
-    font-weight: bold;
-    background-color: white;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
+    /*padding-bottom: 0;*/
+    /*width: 16px;*/
+    /*height: 16px;*/
+    /*text-align: center;*/
+    /*font-size: 16px;*/
+    /*line-height: 16px;*/
+    /*font-weight: bold;*/
+    /*background-color: white;*/
+    /*-webkit-border-radius: 8px;*/
+    /*-moz-border-radius: 8px;*/
+    /*border-radius: 8px;*/
 }
 .ui-layout-toggler {
     background-color: white !important;
@@ -1127,9 +1146,12 @@ article.map div#wrapper {
   /*position: relative;*/
   /*top: 1px;*/
   /*margin-bottom: 2px;*/
-  overflow: auto;
+  overflow: hidden!important;
   display: none;
   zoom: 1;
+}
+.ui-accordion .ui-accordion-content:hover {
+    overflow: auto!important;
 }
 .ui-accordion .ui-accordion-content-active {
   display: block;
