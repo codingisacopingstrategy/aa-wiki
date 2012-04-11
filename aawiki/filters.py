@@ -20,6 +20,7 @@ import urlparse
 import urllib2
 import html5lib
 import lxml
+import lxml.cssselect
 import re
 from aacore import rdfutils
 import subprocess
