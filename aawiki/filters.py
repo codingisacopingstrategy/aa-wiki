@@ -282,6 +282,15 @@ class AAFilterZoomable(AAFilter):
         self.stdout['script'] += """$.panzoom();"""
 
 
+class AAFilterFigure(AAFilter):
+    """
+    [[ embed::http://example.org/image-small.jpg||embed:img|figure:my caption ]]
+    """
+    name = "figure"
+
+    def run(self):
+        self.stdout['output'] = "<figure>%s<figcaption>%s</figcaption></figure>" % (self.stdin['output'], self.arguments)
+
 class AAFilterLightBox(AAFilter):
     """
     [[ embed::http://example.org/image-small.jpg||lightbox:200px ]]
