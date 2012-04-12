@@ -81,9 +81,9 @@ function aaMediaSync (element, opts) {
             elt.setCurrentTime(t);
         } else {
             try {
-            elt.currentTime = t;
+                elt.currentTime = t;
             } catch (e) {
-            console.log("error setting time", elt, t);
+                //console.log("error setting time", elt, t);
             }
         }
     }
