@@ -30,10 +30,9 @@ var aTimeline = function (options) {
         endIndex = -1,
         toShow = {},
         toHide = {},
-        activeItems = {},
-        settings = {};
+        activeItems = {};
 
-    $.extend(settings, options);
+    var settings = $.extend({}, options);
 
     // element wrapper
     function timeline_item (elt, start, end, show, hide) {
@@ -56,12 +55,9 @@ var aTimeline = function (options) {
 
         // addTitleByStart
         /* maintain min/maxTime */
-        /* FIXME: timecodes using a period rather than a comma lead cannot be parsed */
         if ((minTime === undefined) || (newtitle.start < minTime)) { minTime = newtitle.start; }
         if ((maxTime === undefined) || (newtitle.start > maxTime)) { maxTime = newtitle.start; }
         if ((maxTime === undefined) || (newtitle.end && (newtitle.end > maxTime))) { maxTime = newtitle.end; }
-        //console.log(newtitle.elt);
-        //console.log(minTime, maxTime);
 
         /* insert annotation in the correct (sorted) location */
         for (var i=0; i<titlesByStart.length; i++) {
@@ -125,7 +121,11 @@ var aTimeline = function (options) {
     }
 
     function updateForTime (time, controller) {
-        if (titlesByStart.length === 0) { return; }
+        // console.log("updateForTime", time);
+        if (titlesByStart.length === 0) {
+//            console.log("no titlesByStart");
+            return;
+        }
         var n;
         /* check against lastTime to optimize search */
         // valid range for i: -1            (pre first title)
@@ -196,6 +196,11 @@ var aTimeline = function (options) {
 
         /* setCurrentTime : MM: new NOV 2011 */
         // console.log("setCurrentTime", settings);
+        /*
+        if (settings.ontimeupdate) {
+            settings.ontimeupdate(time);
+        }
+        */
         if (settings.setCurrentTime) {
             for (tid in activeItems) {
                 var elt = activeItems[tid];
@@ -239,24 +244,39 @@ var aTimeline = function (options) {
     that.add = add;
 
     function setCurrentTime (ct, evt_controller) {
+        // console.log("timeline.setCurrentTime", ct);
         currentTime = ct;
         updateForTime(ct, evt_controller);
     }
     that.setCurrentTime = setCurrentTime;
+
+    that.setCurrentTimeFromElement = function (elt, ct) {
+        // console.log("timeline.setCurrentTimeFromElement", elt, ct);
+        for (tid in activeItems) {
+            var item = activeItems[tid];
+            if (elt === item.elt) {
+                // console.log("found element", item.start);
+                that.setCurrentTime(ct + item.start, elt);
+                return;
+            }
+        }
+        console.log("timeline.setCurrentTimeFromElement, warning: elt not found");
+    }
+
     that.getCurrentTime = function () { return currentTime; };    
     that.getMinTime = function () { return minTime; }
     that.getMaxTime = function () { return maxTime; }
 
     function debug () {
-        $.log("titlesByStart");
+        console.log("titlesByStart");
         for (var i=0; i<titlesByStart.length; i++) {
             var t = titlesByStart[i];
-            $.log("    ", t.elt, t.start, "("+t.end+")");
+            console.log("    ", t.elt, t.start, "("+t.end+")");
         }
-        $.log("titlesByEnd");
+        console.log("titlesByEnd");
         for (var i=0; i<titlesByEnd.length; i++) {
             var t = titlesByEnd[i];
-            $.log("    ", t.elt, t.end, "("+t.start+")");
+            console.log("    ", t.elt, t.end, "("+t.start+")");
         }
     }
     that.debug = debug;
@@ -266,16 +286,18 @@ var aTimeline = function (options) {
 // finally the plugin method itself
 // based on http://docs.jquery.com/Plugins/Authoring
 
-var settings = {
+
+var defaults = {
     currentTime: function (elt) { return elt.currentTime; },
+    show: function (elt) { $(elt).trigger("show"); },
+    hide: function (elt) { $(elt).trigger("hide"); },
     start : function (elt) { return $.timecode_parse($(elt).attr("data-start")); },
     end : function (elt) { return $.timecode_parse($(elt).attr("data-end")); }
 }
 
 var methods = {
-    init : function(options) {
-        var opts = {};
-        $.extend(opts, settings, options);
+    init : function(opts) {
+        opts = $.extend({}, defaults, opts);
 
         return this.each(function() {
             var elt = this;
@@ -283,25 +305,28 @@ var methods = {
 
             data = $this.data('timeline');
             if (! data) {
-                // FIRST TIME INIT
                 data = {target: $this};
                 data.options = opts;
+                // data.tt = tt();
                 $(this).data('timeline', data);
             }
 
             // init ALWAYS creates a fresh timeline (so it can be used to reset
             // the element and drop evt. dead refs)
-            data.timeline = aTimeline({ 
+            // console.log("init timeline", opts);
+            data.timeline = aTimeline(opts);
+            /*
+            data.timeline = tt({ 
                 show: opts.show, 
                 hide: opts.hide, 
                 setCurrentTime: opts.setCurrentTime
             });
-
+            */
             $this.bind("timeupdate", function (event, controller) {
-                //console.log("timeline: timeupdate", event);
+                // console.log("timeline: timeupdate", event);
                 // allow a wrapped getCurrentTime for the element (via playable?)
                 var ct = opts.currentTime(elt);
-                //console.log("timeline: timeupdate", event.target, ct);
+                // console.log("timeline: timeupdate", event.target, ct);
                 data.timeline.setCurrentTime(ct, controller);
                 return true;
             });
@@ -327,7 +352,8 @@ var methods = {
             return data.timeline.getCurrentTime();
         } else {
             data.timeline.setCurrentTime(t);
-            // $(this.elt).trigger("updatetime");
+            // console.log("currentTime", data.target);
+            $(this).trigger("timeupdate");
             return this;
         }
     },
@@ -340,7 +366,11 @@ var methods = {
     add : function( selector, options ) {
         var data = this.data('timeline');
         options = options || {};
+        var media = [];
+
         $(selector).each(function () {
+            // console.log("add", this);
+
             var start = options.start || data.options.start;
             var end = options.end || data.options.end;
             if (typeof(start) == "function") {
@@ -349,12 +379,11 @@ var methods = {
             if (typeof(end) == "function") {
                 end = end(this);
             }
-            // if (start) start = datetimecode_parse(start);
-            // if (end) end = datetimecode_parse(end, start);
-            if (options.debug) console.log("add", this, start, end);
+            // console.log("timeline.add", this, start, end);
             data.timeline.add(this, start, end, options.show, options.hide);
 
             // NEW (Dec 2011) Watch added elements for timeupdate events
+            /*
             $(this).bind("timeupdate", function (e) {
                 // console.log("NEW timeline.timeupdate", this, e);
                 var sectionTime = $(this).data("currentTime");
@@ -365,6 +394,7 @@ var methods = {
                 // data.timeline.setCurrentTimeFromChild(this, );
                 return false;
             });
+            */
         });
         // console.log("end of add");
         return this;

@@ -161,7 +161,10 @@
 
     function resetTimelines() {
         /* create timeline */
-        $("body").timeline({
+	var master = new VoidPlayer($('#timelineslide').get(0));
+        var sync = $.aaMediaSync(master, {trace: false});
+	
+        $("#timelineslider").data("sync", sync).timeline({
             currentTime: function (elt) {
                 return $(elt).data("datetime");
             },
@@ -186,20 +189,16 @@
                 $(elt).removeClass("active");
             },
             start: function (elt) {
-                // console.log("body start for", elt);
                 return $.datetimecode_parse($(elt).attr("data-start"));
             },
             end: function (elt) {
-                // console.log("body end for", elt);
                 // start is defaultDate for end
                 var start = $.datetimecode_parse($(elt).attr("data-start"));
                 var end = $(elt).data("end");
                 if (end) { return $.datetimecode_parse(end, start); }
             },
             setCurrentTime: function (elt, t) {
-                // console.log("body.timeline.setCurrentTime", t);
                 // shoot a setCurrentTime "event" to any contained player
-                // $(".aaplayer", elt).aaplayer("setCurrentTime", (t/1000));
                 try { $("audio,video", elt).get(0).currentTime = (t/1000); }
                 catch (e) {}
 
@@ -213,7 +212,8 @@
                 if (driver) {
                     driver = driver.get(0);
                     timelinesByURL[url] = driver;
-                    $(driver).timeline({
+		    var sync = $.aaMediaSync(driver);
+                    $(driver).data('sync', sync).timeline({
                         show: function (elt) {
                             $(elt).addClass("active")
                                 .closest('section.section1')
@@ -228,16 +228,21 @@
                     //console.log("WARNING, no media found for about=", url);
                 }
             }
-            return timelinesByURL[url];        
+            return timelinesByURL[url];
         }
 
         /* Activate temporal html! */
         $("[data-start]", $canvas).each(function () {
             var about_url = $.trim($(this).closest("[about]").attr("about"));
             // use the body as timeline if no about is given
-            var timeline = about_url ? timelineForURL(about_url) : $("body").get(0);
+            var timeline = about_url ? timelineForURL(about_url) : $("#timeslider").get(0);
             if (timeline) {
                 $(timeline).timeline("add", this);
+				// add embedded media to sync
+				var sync = $(timeline).data("sync");
+				$("audio|video", this).each(function() {
+		    		sync.add(this, $(this).attr('data-start'), $(this).attr('data-end'));
+				});
             }
         });
 
