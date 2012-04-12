@@ -48,7 +48,7 @@ function aaMediaSync (element, opts) {
         var i, l, m;
         for (i=0, l=syncedmedia.length; i<l; i++) {
             m = syncedmedia[i];
-            if (!is_visible(m)) { continue; }
+            // if (!is_visible(m)) { continue; }
             if (! ((m.readyState >= 3) && !m.seeking) ) {
                 return false;
             }
@@ -80,7 +80,11 @@ function aaMediaSync (element, opts) {
         if (elt.setCurrentTime) {
             elt.setCurrentTime(t);
         } else {
+            try {
             elt.currentTime = t;
+            } catch (e) {
+            console.log("error setting time", elt, t);
+            }
         }
     }
 
@@ -112,7 +116,7 @@ function aaMediaSync (element, opts) {
     }
 
     function enter (elt) {
-        //console.log("enter", elt);
+        // console.log("enter", elt);
         // sync elt time to timeline
         var rt = getRelativeTime(element, elt);
         if (opts.trace) console.log("enter", elt, rt);
@@ -138,7 +142,7 @@ function aaMediaSync (element, opts) {
         if (opts.trace) console.log("initiate groupplay");
         if (get_all_ready()) {
             $(syncedmedia).each(function () {
-                if (this != triggering_elt && is_visible(this)) {
+                if (this != triggering_elt) { //  && is_visible(this)) {
                     this.play() 
                 }
             });
@@ -150,9 +154,9 @@ function aaMediaSync (element, opts) {
             if (opts.trace) console.log("ready, calling play");
             // timeline.play();
             $(syncedmedia).each(function () {
-                if (is_visible(this)) {
+                // if (is_visible(this)) {
                     this.play() 
-                }
+                //}
             });
             window.setTimeout(function () {
                 initiatingGroupPlay = false;
@@ -183,7 +187,8 @@ function aaMediaSync (element, opts) {
                         // console.log("restore play state audio");
                         // timeline.play();
                         $(syncedmedia).each(function () {
-                            if (is_visible(this)) { this.play(); } 
+                            // if (is_visible(this)) { this.play(); }
+                            this.play(); 
                         });
                     }
                 });
@@ -217,7 +222,8 @@ function aaMediaSync (element, opts) {
         bind(elt, "pause.aamediasync", function () {
             // console.log(elt, "pause");
             var eventreceiver = this;
-            if (is_visible(this) && initiatingGroupPlay === false && driver === null) {
+            // if (is_visible(this) && initiatingGroupPlay === false && driver === null) {
+            if (initiatingGroupPlay === false && driver === null) {
                 // TRIGGER GROUP PAUSE
                 // timeline.pause();
                 $(syncedmedia).each(function () {
