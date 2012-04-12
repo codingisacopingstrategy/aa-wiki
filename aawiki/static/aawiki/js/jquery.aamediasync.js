@@ -12,6 +12,7 @@
 
 function aaMediaSync (element, opts) {
     var that = {element: element},
+        allmedia = [element],
         syncedmedia = [element],
         uid = 0,
         driver = null,
@@ -35,6 +36,7 @@ function aaMediaSync (element, opts) {
 
     function add(elt, start, end) {
         var id = ++uid;
+        allmedia.push(elt);
         syncedmedia.push(elt);
         // console.log("aamediasync.add", elt, start, end);
         $(elt).data("aamediasync", {start: start, end: end});
@@ -134,6 +136,14 @@ function aaMediaSync (element, opts) {
 
     function groupplay (triggering_elt) {
         if (opts.trace) console.log("initiate groupplay");
+        if (get_all_ready()) {
+            $(syncedmedia).each(function () {
+                if (this != triggering_elt && is_visible(this)) {
+                    this.play() 
+                }
+            });
+            return;
+        }
         initiatingGroupPlay = true;
         if (triggering_elt) triggering_elt.pause();
         when_all_ready(function () {
@@ -151,7 +161,7 @@ function aaMediaSync (element, opts) {
     }
 
     function bindevents (elt) {
-        bind(elt, "seeking", function () {
+        bind(elt, "seeking.aamediasync", function () {
             if (opts.trace) console.log("seeking", this);
             if (driver === null) {
                 driver = this;
@@ -161,7 +171,7 @@ function aaMediaSync (element, opts) {
                 $(syncedmedia).each(function () { this.pause(); });
             }
         });
-        bind(elt, "seeked", function () {
+        bind(elt, "seeked.aamediasync", function () {
             if (driver === this) {
                 // driver = null;
                 this.pause(); // HACK TO OVERRIDE (firefox) scrub resuming play
@@ -179,7 +189,7 @@ function aaMediaSync (element, opts) {
                 });
             }
         })
-        bind(elt, "timeupdate", function () {
+        bind(elt, "timeupdate.aamediasync", function () {
             var media = $(this).data("media");
             if (driver === this) {
                 // SCRUB (timeupdate while buffering = scrub event ?!)
@@ -198,30 +208,14 @@ function aaMediaSync (element, opts) {
                 });
             }
         });
-        bind(elt, "play", function () {
+        bind(elt, "play.aamediasync", function () {
+            // console.log(elt, "play");
             if (initiatingGroupPlay === false) {
                 groupplay(this);
-                /*
-                if (opts.trace) console.log("initiate groupplay");
-                initiatingGroupPlay = true;
-                this.pause();
-                when_all_ready(function () {
-                    if (opts.trace) console.log("ready, calling play");
-                    // timeline.play();
-                    $(syncedmedia).each(function () {
-                        if (is_visible(this)) {
-                            this.play() 
-                        }
-                    });
-                    window.setTimeout(function () {
-                        initiatingGroupPlay = false;
-                    }, 1000);
-                });
-                */
             }
         });
-        bind(elt, "pause", function () {
-            // console.log("audio: pause");
+        bind(elt, "pause.aamediasync", function () {
+            // console.log(elt, "pause");
             var eventreceiver = this;
             if (is_visible(this) && initiatingGroupPlay === false && driver === null) {
                 // TRIGGER GROUP PAUSE
@@ -234,6 +228,22 @@ function aaMediaSync (element, opts) {
             }
         });
     }
+    function destroy () {
+        // NB: destroy should be called if a sync element is dropped or replaced.
+        // It unbinds all events to avoid future (often duplicate) reception of the events
+        $(allmedia).each(function () {
+            if (this.element) {
+                $(this.element).unbind('.aamediasync');
+            } else {
+                $(this).unbind(".aamediasync");
+            }
+        });
+        // maybe not strictly necessary, but...
+        allmedia = null;
+        syncedmedia = null;
+    }
+    that.destroy = destroy;
+
     return that;
 }
 $.aaMediaSync = aaMediaSync;

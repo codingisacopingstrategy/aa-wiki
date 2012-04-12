@@ -165,7 +165,10 @@ function placeLandmarks () {
 
 function resetTimelines() {
     /* create timeline */
-    var sync = $.aaMediaSync(master, {trace: false});
+    
+    var sync = $("#timelineslider").data("sync");
+    if (sync) { sync.destroy(); } 
+    sync = $.aaMediaSync(master, {trace: false});
     $("#timelineslider").data("sync", sync).timeline({
         currentTime: function (elt) {
             return master.currentTime;
@@ -205,10 +208,15 @@ function resetTimelines() {
         if (timelinesByURL[url] === undefined) {
             var driver = $("video[src='" + url + "'], audio[src='" + url + "']").first();
             if (driver.size()) {
-                console.log("DRIVER", driver);
+                //console.log("DRIVER", driver);
                 driver = driver.get(0);
                 timelinesByURL[url] = driver;
-	            var sync = $.aaMediaSync(driver);
+	            var sync = $(driver).data("sync");
+                if (sync) {
+                   console.log("dropping old sync");
+            sync.destroy();
+                }
+                sync = $.aaMediaSync(driver);
                 $(driver).data('sync', sync).timeline({
                     show: function (elt) {
                         $(elt).addClass("active")
