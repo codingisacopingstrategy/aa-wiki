@@ -21,7 +21,6 @@
  * @requires jquery.caret.js
  */
 
-var master;
 
 (function($) {
 
@@ -30,6 +29,8 @@ var timelinesByURL = {};
 var $canvas;
 var $sidebar;
 var embedUrl;
+var master;
+var showTimeRemaining = false; // TIME DISPLAY STYLE FLAG
 
 //var actionStack = [];  // Not Implemented
 
@@ -255,11 +256,15 @@ function resetTimelines() {
         }
     });
 
-    /* Hides the slider if there is no titles attached to the body */
-    if ($('#timelineslider').timeline('maxTime') === undefined) {
+    /* Set master.duration or else hide the slider if there are no titles attached to the page timeline */
+    var maxTime = $("#timelineslider").timeline("maxTime");
+    // console.log("maxTime", maxTime);
+    if (maxTime === undefined) {
         $('#timelineslider, #time, #playpause').hide();
     } else {
+        master.setDuration(maxTime);
         $('#timelineslider, #time, #playpause').show();
+        $("#timelineslider").trigger("timeupdate"); // force time update
     }
 }
 
@@ -470,6 +475,10 @@ $(document).ready(function() {
     }).bind("pause", function () {
         $("#playpause").text("play");
     });
+    $("#time").click(function () {
+        showTimeRemaining = !showTimeRemaining;
+        $("#timelineslider").trigger("timeupdate"); // force refresh
+    });
 
     $("#mode input").change(function() {
         var classes = [],
@@ -546,16 +555,15 @@ $(document).ready(function() {
 
     var slider_max = 100000;
     $("#timelineslider").bind("timeupdate", function () {
-        var currentTime, minTime, maxTime, nextTime, $body;
-
-        maxTime = $(this).timeline("maxTime");
-        // console.log("*** maxTime", maxTime); 
-        // evt. auto (re) set the master.duration to match the maxTime
         var slider_val = (master.currentTime / master.duration) * slider_max;
         $("#timelineslider").slider("option", "value", slider_val);
-        $("#time").text(master.currentTime.secondsTo("mm:ss"));
-    });
+        if (showTimeRemaining) {
+            $("#time").text("-" + (master.duration-master.currentTime).secondsTo("mm:ss") + " / " + master.duration.secondsTo("mm:ss"));
+        } else {
+            $("#time").text(master.currentTime.secondsTo("mm:ss") + " / " + master.duration.secondsTo("mm:ss"));
+        }
 
+    });
     $('#timelineslider').slider({
         max: slider_max,
         slide: function (evt, ui) {
