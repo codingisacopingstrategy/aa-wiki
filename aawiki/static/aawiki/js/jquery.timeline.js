@@ -309,27 +309,17 @@ var methods = {
                 data.options = opts;
                 // data.tt = tt();
                 $(this).data('timeline', data);
-            }
 
-            // init ALWAYS creates a fresh timeline (so it can be used to reset
-            // the element and drop evt. dead refs)
-            // console.log("init timeline", opts);
+                // ONLY HAPPENS ON THE FIRST CALL
+                $this.bind("timeupdate.aatimeline", function (event, controller) {
+                    var ct = opts.currentTime(elt);
+                    // console.log("timeline: timeupdate", event.target, ct);
+                    data.timeline.setCurrentTime(ct, controller);
+                    return true;
+                });
+            }
+            // init ALWAYS creates a fresh timeline
             data.timeline = aTimeline(opts);
-            /*
-            data.timeline = tt({ 
-                show: opts.show, 
-                hide: opts.hide, 
-                setCurrentTime: opts.setCurrentTime
-            });
-            */
-            $this.bind("timeupdate", function (event, controller) {
-                // console.log("timeline: timeupdate", event);
-                // allow a wrapped getCurrentTime for the element (via playable?)
-                var ct = opts.currentTime(elt);
-                // console.log("timeline: timeupdate", event.target, ct);
-                data.timeline.setCurrentTime(ct, controller);
-                return true;
-            });
         });
     },
     destroy : function( ) {
@@ -337,9 +327,7 @@ var methods = {
         return this.each(function(){
             var $this = $(this),
             data = $this.data('timeline');
-
-            // Namespacing FTW
-            $(window).unbind('.timeline');
+            $this.unbind('.aatimeline'); // untested
             // data.tooltip.remove();
             $this.removeData('timeline');
 
