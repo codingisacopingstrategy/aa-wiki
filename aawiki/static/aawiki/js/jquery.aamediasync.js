@@ -22,6 +22,9 @@ function aaMediaSync (element, opts) {
         trace: false
     }, opts);
 
+
+    // console.log("aaMediaSync", element);
+
     bindevents(element);
 
     function remove (array, elt) {
@@ -107,6 +110,7 @@ function aaMediaSync (element, opts) {
     }
 
     function enter (elt) {
+        //console.log("enter", elt);
         // sync elt time to timeline
         var rt = getRelativeTime(element, elt);
         if (opts.trace) console.log("enter", elt, rt);
@@ -121,6 +125,7 @@ function aaMediaSync (element, opts) {
     that.enter = enter;
 
     function exit (elt) {
+        // console.log("exit", elt);
         if (opts.trace) console.log("exit");
         remove(syncedmedia, elt);
         elt.pause();
@@ -141,7 +146,7 @@ function aaMediaSync (element, opts) {
             });
             window.setTimeout(function () {
                 initiatingGroupPlay = false;
-            }, 1000);
+            }, 500);
         });
     }
 

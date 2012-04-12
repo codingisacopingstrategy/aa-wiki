@@ -5,11 +5,15 @@
 
 (function($) {
 
-	window.VoidPlayer = function (element) {
+	window.VoidPlayer = function (element, opts) {
+        opts = $.extend({
+            duration: 3600
+        }, opts);
+
 		this.element = element;
 		this.$element = $(element);
         this.paused = true;
-        this.duration = this.$element.attr("data-duration").toSeconds();
+        this.duration = opts.duration;
         this.currentTime = 0;
 
         /* Void player is always ready ! */
@@ -21,6 +25,10 @@
 	}
 
 	VoidPlayer.plugins = {};
+
+    VoidPlayer.prototype.setDuration = function (d) {
+        this.duration = d;
+    }
 
     VoidPlayer.prototype.play = function () {
         // console.log("voidplayer.play");
