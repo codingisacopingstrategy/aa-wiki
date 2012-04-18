@@ -1,4 +1,13 @@
+#! /usr/bin/env python2
+
+
 """
+Splits a markdown source into a flat list of sections.
+
+Markdown extension adds {@data-section=%d} attribute markup to headers.
+
+Provides: sectionalize
+
     >>> txt = '''
     ... # Section 1
     ... 1984-10-21 00:10,125 -->
@@ -86,7 +95,7 @@ DATETIMECODE_HEADER_RE = r'^%(DATETIMECODE_RE)s(%(OTHER_RE)s)?$' % locals()
 HASH_OR_DATETIMECODE_HEADER_RE = "(%s|%s)" % (HASH_HEADER_RE, DATETIMECODE_HEADER_RE)
 
 
-def spliterator (pattern, text, returnLeading=False):
+def spliterator (pattern, text):
     """
     Splits the given text according to the given pattern.
 
@@ -119,6 +128,7 @@ def spliterator (pattern, text, returnLeading=False):
         {'body': '\\n1984-10-21 00:10,125 -->\\nSome text\\n1984-10-21 00:10,125 --> 01:00:05.300\\nMore text\\n## Section 2\\n00:10,125 --> Some title {: id="myid" }\\nSections can have some more text\\n00:30-->00:40\\nspaces are optionals\\n### Section 3\\n',
          'end': 231,
          'header': '# Section 1',
+         'level': 1,
          'start': 1}
 
 
@@ -130,21 +140,24 @@ def spliterator (pattern, text, returnLeading=False):
         {'body': '\\nSome text\\n',
          'end': 48,
          'header': '1984-10-21 00:10,125 -->',
+         'level': 2,
          'start': 13}
         {'body': '\\nMore text\\n',
          'end': 96,
          'header': '1984-10-21 00:10,125 --> 01:00:05.300',
+         'level': 2,
          'start': 48}
-        {'body': '\\n', 'end': 109, 'header': '## Section 2', 'start': 96}
+        {'body': '\\n', 'end': 109, 'header': '## Section 2', 'level': 2, 'start': 96}
         {'body': '\\nSections can have some more text\\n',
          'end': 182,
          'header': '00:10,125 --> Some title {: id="myid" }',
+         'level': 2,
          'start': 109}
         {'body': '\\nspaces are optionals\\n### Section 3\\n',
          'end': 231,
          'header': '00:30-->00:40',
+         'level': 2,
          'start': 182}
-
     """
     matches = pattern.finditer(text)
     match = matches.next()
@@ -152,44 +165,82 @@ def spliterator (pattern, text, returnLeading=False):
     header = text[match.start():match.end()]
     index = match.end() 
 
+    # Computes the heading level from the regex match group "level". If not
+    # present, it means that we are facing a (date)timecode header, hence a
+    # level 2 header according to our hierarchy.
+    level = len(match.groupdict()['level'] or "##")
+
     for match in matches:
-        yield dict(header=header, body=text[index:match.start()], start=start, end=match.start())
-        start = match.start()
-        header = text[match.start():match.end()]
-        index = match.end() 
+        if level >= len(match.groupdict()['level'] or "##"):
+            yield dict(header=header, body=text[index:match.start()], start=start, end=match.start(), level=level)
+            start = match.start()
+            header = text[match.start():match.end()]
+            index = match.end() 
+            level = len(match.groupdict()['level'] or "##")
 
-    yield dict(header=header, body=text[index:], start=start, end=len(text))
+    yield dict(header=header, body=text[index:], start=start, end=len(text), level=level)
 
 
-def sectionalize(text, depth=1, sections=None, offset=0):
+def sectionalize(text, sections=None, offset=0):
     """
         >>> from pprint import pprint
         >>> txt = '''
+        ... Some text before
         ... # Section 1
         ... some text
-        ... 1984-10-21 00:10,125 -->
+        ... ### Section 3
         ... Some more text
+        ... ## Section 2
+        ... more text
+        ... 00:00:10 --> Timed section
+        ... more text
+        ... ### Section 3 again
+        ... more text
         ... # Section 1 again
         ... more text
         ... '''
 
         >>> for section in sectionalize(txt):
-        ...     pprint(section)
-        {'body': '\\nsome text\\n1984-10-21 00:10,125 -->\\nSome more text\\n',
-         'end': 63,
-         'header': '# Section 1',
-         'index': 0,
-         'start': 1}
-        {'body': '\\nSome more text\\n',
-         'end': 63,
-         'header': '1984-10-21 00:10,125 -->',
-         'index': 1,
-         'start': 23}
-        {'body': '\\nmore text\\n',
-         'end': 91,
-         'header': '# Section 1 again',
-         'index': 2,
-         'start': 63}
+        ...     print(r'================================')
+        ...     print(section['start'], section['end'])
+        ...     print(section['header'] + section['body'])
+        ================================
+        (18, 159)
+        # Section 1
+        some text
+        ### Section 3
+        Some more text
+        ## Section 2
+        more text
+        00:00:10 --> Timed section
+        more text
+        ### Section 3 again
+        more text
+        <BLANKLINE>
+        ================================
+        (40, 69)
+        ### Section 3
+        Some more text
+        <BLANKLINE>
+        ================================
+        (69, 159)
+        ## Section 2
+        more text
+        00:00:10 --> Timed section
+        more text
+        ### Section 3 again
+        more text
+        <BLANKLINE>
+        ================================
+        (129, 159)
+        ### Section 3 again
+        more text
+        <BLANKLINE>
+        ================================
+        (159, 187)
+        # Section 1 again
+        more text
+        <BLANKLINE>
 
     We make sure that the section start and end indices are right:
 
@@ -202,10 +253,7 @@ def sectionalize(text, depth=1, sections=None, offset=0):
         sections = []
         #sections = [dict(header='', body=text, start=0, end=len(text), index=0)]
 
-    if depth == 2:
-        pattern = re.compile(HASH_OR_DATETIMECODE_HEADER_RE % depth, re.M)
-    else:    
-        pattern = re.compile(HASH_HEADER_RE % depth, re.M)
+    pattern = re.compile(HASH_HEADER_RE % '1,6', re.M)
 
     for section in spliterator(pattern, text):
         section['index'] = len(sections)  # numbers the section
@@ -213,53 +261,50 @@ def sectionalize(text, depth=1, sections=None, offset=0):
         section['end'] = section['end'] + offset
         sections.append(section)
 
-        if depth < 6 and section['body']:
-            sectionalize(section['body'], depth + 1, sections, offset=(section['start'] + len(section['header'])))
+        if section['level'] < 6 and section['body']:
+            sectionalize(section['body'], sections, offset=(section['start'] + len(section['header'])))
 
     return sections
 
 
-def sectionalize_2(text, depth=1, sections=None, offset=0):
-    """
-        >>> from pprint import pprint
-        >>> txt = '''
-        ... # Section 1
-        ... some text
-        ... ### Section 3
-        ... Some more text
-        ... ## Section 1 again
-        ... more text
-        ... '''
+def sectionalize_replace (original_text, section_number, new_text):
+    sections = sectionalize(original_text)
+    pre_text = original_text[:sections[section_number]['start']]
+    post_text = original_text[sections[section_number]['end']:]
+    return u"".join([pre_text, new_text, post_text])
 
-        >>> for section in sectionalize_2(txt):
-        ...     print(section['start'], section['end'])
-        ...     print(section['header'] + section['body'])
-        ...     print('***********************************')
 
-    We make sure that the section start and end indices are right:
+class SectionEditExtension(markdown.Extension):
+    def __init__(self, configs={}):
+        self.config = {}
+        for key, value in configs:
+            self.setConfig(key, value)
 
-        >>> for section in sectionalize_2(txt):
-        ...     txt1 = section['header'] + section['body']
-        ...     txt2 = txt[section['start']:section['end']]
-        ...     assert txt1 == txt2
-    """
-    if sections is None:
-        sections = []
-        #sections = [dict(header='', body=text, start=0, end=len(text), index=0)]
+    def extendMarkdown(self, md, md_globals):
+        """ Add SectionEditPreprocessor to the Markdown instance. """
 
-    repetitions = '%s,6' % depth
-    pattern = re.compile(HASH_HEADER_RE % repetitions, re.M)
+        ext = SectionEditPreprocessor(md)
+        ext.config = self.config
+        md.preprocessors.add('section_edit_block', ext, ">timecodes_block")
 
-    for section in spliterator(pattern, text):
-        section['index'] = len(sections)  # numbers the section
-        section['start'] = section['start'] + offset  # fixes the offset
-        section['end'] = section['end'] + offset
-        sections.append(section)
 
-        if depth < 6 and section['body']:
-            sectionalize_2(section['body'], depth + 1, sections, offset=(section['start'] + len(section['header'])))
+class SectionEditPreprocessor(markdown.preprocessors.Preprocessor):
+    def run(self, lines):
+        """ Adds section numbers to sections """
+        newlines = []
+        pattern = re.compile(HASH_OR_DATETIMECODE_HEADER_RE % '1,6', re.M)
+        i = 0
+        for line in lines:
+            if pattern.match(line):
+                newlines.append(line.rstrip() + " {@data-section=%d}" % (i+1))
+                i += 1
+            else:
+                newlines.append(line)
+        return newlines
 
-    return sections
+
+def makeExtension(configs={}):
+    return SectionEditExtension(configs=configs)
 
 
 if __name__ == "__main__":
