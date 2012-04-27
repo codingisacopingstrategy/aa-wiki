@@ -22,6 +22,12 @@ Please first install these software in order to get AA running properly:
   - Python dateutil <http://labix.org/python-dateutil>
   - Pygraphviz <http://networkx.lanl.gov/pygraphviz/>
   - Python librdf (Redland) <http://librdf.org/>
+  - Python mdx cite <http://pypi.python.org/pypi/mdx_cite>
+  - Python mdx del ins <http://pypi.python.org/pypi/mdx_del_ins>
+  - Python mdx semantic wikilinks <http://pypi.python.org/pypi/mdx_semanticwikilinks>
+  - Python mdx semantic data <http://pypi.python.org/pypi/mdx_semanticdata>
+  - Python mdx outline <http://pypi.python.org/pypi/mdx_outline>
+
 
 On Ubuntu, this should do the trick:
 
@@ -33,6 +39,11 @@ On Ubuntu, this should do the trick:
     sudo pip install diff-match-patch
     sudo pip install python-dateutil
     sudo pip install pygraphviz
+    sudo pip install mdx_cite
+    sudo pip install mdx_del_ins
+    sudo pip install mdx_semanticwikilinks
+    sudo pip install mdx_semanticdata
+    sudo pip install mdx_outline
     sudo apt-get install python-librdf
 
 Additionally, you'll need the following for the RDF sniffers:

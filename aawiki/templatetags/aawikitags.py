@@ -4,7 +4,7 @@ from datetime import datetime
 from django.template.defaultfilters import stringfilter
 from django import template
 from aawiki import utils
-from aawiki.mdx import (get_markdown, get_simple_markdown)
+from aawiki.mdx import get_markdown
 from aawiki import tags
 
 
@@ -94,6 +94,6 @@ def aasimplemarkdown (value):
     """ 
     markdown with aa extensions
     """
-    md = get_simple_markdown()
+    md = get_markdown(simple=True)
     return md.convert(value)
 aamarkdown.is_safe = True
