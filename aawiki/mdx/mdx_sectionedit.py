@@ -84,7 +84,6 @@ import markdown
 import re
 
 
-#HASH_HEADER_RE = r'^(?P<level>#{%s})(?P<header>.*?)#*$'
 HASH_HEADER_RE = r'^(?P<level>#{%s})[^#](?P<header>.*?)#*$'
 DATE_RE = r'\d\d\d\d-\d\d-\d\d'
 TIME_RE = r'(\d\d:)?(\d\d):(\d\d)([,.]\d{1,3})?'
@@ -168,15 +167,15 @@ def spliterator (pattern, text):
     # Computes the heading level from the regex match group "level". If not
     # present, it means that we are facing a (date)timecode header, hence a
     # level 2 header according to our hierarchy.
-    level = len(match.groupdict()['level'] or "##")
+    level = len(match.groupdict().get('level') or "##")
 
     for match in matches:
-        if level >= len(match.groupdict()['level'] or "##"):
+        if level >= len(match.groupdict().get('level') or "##"):
             yield dict(header=header, body=text[index:match.start()], start=start, end=match.start(), level=level)
             start = match.start()
             header = text[match.start():match.end()]
             index = match.end() 
-            level = len(match.groupdict()['level'] or "##")
+            level = len(match.groupdict().get('level') or "##")
 
     yield dict(header=header, body=text[index:], start=start, end=len(text), level=level)
 
@@ -205,6 +204,23 @@ def sectionalize(text, sections=None, offset=0):
         ...     print(section['start'], section['end'])
         ...     print(section['header'] + section['body'])
         ================================
+        (0, 187)
+        <BLANKLINE>
+        Some text before
+        # Section 1
+        some text
+        ### Section 3
+        Some more text
+        ## Section 2
+        more text
+        00:00:10 --> Timed section
+        more text
+        ### Section 3 again
+        more text
+        # Section 1 again
+        more text
+        <BLANKLINE>
+        ================================
         (18, 159)
         # Section 1
         some text
@@ -223,9 +239,12 @@ def sectionalize(text, sections=None, offset=0):
         Some more text
         <BLANKLINE>
         ================================
-        (69, 159)
+        (69, 92)
         ## Section 2
         more text
+        <BLANKLINE>
+        ================================
+        (92, 159)
         00:00:10 --> Timed section
         more text
         ### Section 3 again

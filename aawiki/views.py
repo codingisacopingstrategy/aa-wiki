@@ -154,12 +154,18 @@ def annotation_export(request, slug, section, _format="audacity",
     page = Page.objects.get(name=name)
 
     section = sectionalize(page.content)[int(section)]
-    pattern = re.compile(DATETIMECODE_HEADER_RE, re.I | re.M | re.X)
+
+    # TODO: Regex should not be defined more once within active archives
+    TIME_RE = r'(\d\d:)?(\d\d):(\d\d)([,.]\d{1,3})?'
+    TIMECODE_RE = r'(?P<start>%(TIME_RE)s)[ \t]*-->([ \t]*(?P<end>%(TIME_RE)s))?' % locals()
+    OTHER_RE = r'.+'
+    TIMECODE_HEADER_RE = r'^%(TIMECODE_RE)s(%(OTHER_RE)s)?$' % locals()
+
+    pattern = re.compile(TIMECODE_HEADER_RE, re.I | re.M | re.X)
 
     stack = []
-    for t in spliterator(pattern, section['header'] + section['body'], 
-                         returnLeading=0):
-        m = pattern.match(t[0]).groupdict()
+    for t in spliterator(pattern, section['header'] + section['body']):
+        m = pattern.match(t['header']).groupdict()
 
         if force_endtime:
             if len(stack) and stack[-1]['end'] == '':
@@ -171,7 +177,7 @@ def annotation_export(request, slug, section, _format="audacity",
         stack.append({
             'start': timecode_tosecs(m['start']),
             'end': end,
-            'body': t[1].strip('\n'),
+            'body': t['body'].strip('\n'),
         })
 
     context = {'sections': stack}
