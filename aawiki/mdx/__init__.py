@@ -60,6 +60,30 @@ def make_link(rel, target, label, default_link_rel=None, filter_=None):
     return a
 
 
+def aa_make_link(rel, target, label):
+    a = etree.Element('a')
+    a.set('href', target)
+
+    if rel:
+        a.set('rel', rel or 'aa:link')
+    else:
+        a.set('rel', 'aa:link')
+
+    if label:
+        if label.startswith('|'):
+            label, filter_ = None, label[1:] 
+        else:
+            try:
+                label, filter_ = label.split('|', 1)
+            except ValueError:
+                filter_ = None 
+        if filter_:
+            a.set('data-filter', filter_.strip())
+
+    a.text = label or target
+    return a
+
+
 #"""
 #    <a rel="aa:link" href="/pages/Anthology_walk%2Btalk_Brussels">
 #        <span about="/pages/Anthology_walk%2Btalk_Brussels">

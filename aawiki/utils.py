@@ -40,23 +40,30 @@ def pagename_for_url(url):
 def wikify(name):
     """
     Turns a "raw" name into a URL wiki name (aka slug)
-    Requires: name may be unicode, str
-    Returns: str
 
-    (1) Spaces turn into underscores.
-    (2) The First letter is forced to be Uppercase (normalization).
-    (3) For the rest, non-ascii chars get percentage escaped.
+    1. Spaces turn into underscores.
+    2. The First letter is forced to be Uppercase (normalization).
+    3. For the rest, non-ascii chars get percentage escaped.
+
     (Unicode chars be (properly) encoded to bytes and urllib.quote'd to double escapes like "%23%25" as required)
+
+    >>> wikify("my page name")
+    'My_page_name'
+
+    >>> wikify(";/?:@=#&")
+    '%3B%2F%3F%3A%40%3D%23%26'
     """
-    name = name.strip()
-    name = name.replace(" ", "_")
+    name = name.strip().replace(" ", "_")
+
     if len(name):
         name = name[0].upper() + name[1:]
+
     if (type(name) == unicode):
         # urllib.quoting(unicode) with accents freaks out so encode to bytes
         name = name.encode("utf-8")
-    name = urllib.quote(name, safe="")
-    return name
+
+    return urllib.quote(name, safe="")
+
 
 def dewikify(name):
     """

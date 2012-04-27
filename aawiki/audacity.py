@@ -17,7 +17,7 @@
 
 
 import re
-from aawiki.mdx.mdx_sectionedit import (TIMECODE_HEADER, spliterator)
+from aawiki.mdx.mdx_sectionedit import (DATETIMECODE_HEADER_RE, spliterator)
 from aawiki.timecode import (timecode_fromsecs, timecode_tosecs)
 
 
@@ -109,7 +109,7 @@ def audacity_to_srt(data, explicit=False):
 def srt_to_audacity(data, force_endtime=False):
     """docstring for srt_to_audacity"""
     # FIXME: UnicodeDecodeError...
-    pattern = re.compile(TIMECODE_HEADER, re.I | re.M | re.X)
+    pattern = re.compile(DATETIMECODE_HEADER_RE, re.I | re.M | re.X)
 
     stack = []
     for t in spliterator(pattern, data, returnLeading=0):

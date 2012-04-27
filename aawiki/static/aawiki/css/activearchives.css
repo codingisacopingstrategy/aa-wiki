@@ -1024,13 +1024,14 @@ article.map div#wrapper {
     border: 1px solid gray;
     padding: 0 5px;
     background-color: white;
-}
-.ui-button .ui-button-text {
-    display: block;
     font-family: 'News Cycle';
     font-size: 9px;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+.ui-button .ui-button-text {
+    display: block;
+    font-size: 9px;
 }
 .ui-helper-clearfix:before, .ui-helper-clearfix:after {
     content: "";

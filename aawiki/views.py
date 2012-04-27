@@ -36,7 +36,7 @@ from aacore.utils import add_resource
 from aawiki.utils import (dewikify, convert_line_endings)
 from aawiki.mdx import get_markdown
 from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace, 
-                                        TIMECODE_HEADER, spliterator)
+                                        DATETIMECODE_HEADER_RE, spliterator)
 from aawiki.forms import (PageEditForm, AnnotationImportForm)
 from aawiki.audacity import audacity_to_srt
 from aawiki.timecode import timecode_tosecs
@@ -154,7 +154,7 @@ def annotation_export(request, slug, section, _format="audacity",
     page = Page.objects.get(name=name)
 
     section = sectionalize(page.content)[int(section)]
-    pattern = re.compile(TIMECODE_HEADER, re.I | re.M | re.X)
+    pattern = re.compile(DATETIMECODE_HEADER_RE, re.I | re.M | re.X)
 
     stack = []
     for t in spliterator(pattern, section['header'] + section['body'], 
@@ -348,7 +348,7 @@ def page_edit(request, slug):
                     if section == -1:
                         page.content = page.content.rstrip() + "\n\n" + content
                     else:
-                        page.content = sectionalize_replace(page.content, section, content, keep_header=keep_header)
+                        page.content = sectionalize_replace(page.content, section, content)
                     if page.content != old_content:
                         page.commit(message=message, author=author, is_minor=is_minor)
                 else:
