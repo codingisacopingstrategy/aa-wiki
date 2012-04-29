@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import *
 from django.views.generic.simple import (redirect_to, direct_to_template)
+from tastypie.api import Api
+from aawiki.api import (PageResource, SectionResource)
 
 
 urlpatterns = patterns('aawiki.views',
@@ -30,3 +32,12 @@ urlpatterns = patterns('aawiki.views',
     #url(r'^accounts/login/$', 'login', {'template_name': 'aawiki/login.html'}, name='aa-login'),
     #url(r'^accounts/logout/$', 'logout', {'template_name': 'aawiki/logout.html'}, name='aa-logout'),
 #)
+
+
+v1_api = Api(api_name='v1')
+#v1_api.register(PageResource())
+v1_api.register(SectionResource())
+
+urlpatterns += patterns('',
+    (r'^api/', include(v1_api.urls)),
+)

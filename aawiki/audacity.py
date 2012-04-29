@@ -109,11 +109,17 @@ def audacity_to_srt(data, explicit=False):
 def srt_to_audacity(data, force_endtime=False):
     """docstring for srt_to_audacity"""
     # FIXME: UnicodeDecodeError...
-    pattern = re.compile(DATETIMECODE_HEADER_RE, re.I | re.M | re.X)
+    # TODO: Regex should not be defined more once within active archives
+    TIME_RE = r'(\d\d:)?(\d\d):(\d\d)([,.]\d{1,3})?'
+    TIMECODE_RE = r'(?P<start>%(TIME_RE)s)[ \t]*-->([ \t]*(?P<end>%(TIME_RE)s))?' % locals()
+    OTHER_RE = r'.+'
+    TIMECODE_HEADER_RE = r'^%(TIMECODE_RE)s(%(OTHER_RE)s)?$' % locals()
+
+    pattern = re.compile(TIMECODE_HEADER_RE, re.I | re.M | re.X)
 
     stack = []
-    for t in spliterator(pattern, data, returnLeading=0):
-        m = pattern.match(t[0]).groupdict()
+    for t in spliterator(pattern, data):
+        m = pattern.match(t['header']).groupdict()
 
         if force_endtime:
             if len(stack) and stack[-1]['end'] == '':
@@ -125,11 +131,11 @@ def srt_to_audacity(data, force_endtime=False):
         stack.append({
             'start': timecode_tosecs(m['start']),
             'end': end,
-            'body': t[1].strip('\n'),
+            'body': t['body'].strip('\n').replace('\n', r'\n'),
         })
 
-    template = "{e[start]}\t{e[end]}\t{e[body]}\n"
-    return "".join([template.format(e=e) for e in stack])
+    template = u"{e[start]}\t{e[end]}\t{e[body]}\n"
+    return u"".join([template.format(e=e) for e in stack])
 
 
 if __name__ == "__main__":

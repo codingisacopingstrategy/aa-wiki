@@ -40,7 +40,7 @@ class Page(models.Model):
     last revision of a page for convenience.
     
     """
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     content = models.TextField(blank=True)
 
     def __unicode__(self):
