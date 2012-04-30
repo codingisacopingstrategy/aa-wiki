@@ -1,0 +1,24 @@
+{% load aawikitags %}
+
+<h3><a href="#">Introduction</a></h3>
+<div id="tab-about">
+{% if meta.ispartof or meta.editedby %}
+<p>
+{% endif %}
+{% if meta.ispartof %}
+This page is part of the publication{{ meta.ispartof|pluralize }} 
+{% for publication in meta.ispartof %}
+“<a href="../{{ publication|wikify }}">{{ publication }}</a>”.
+{% endfor %}
+{% endif %}
+
+{% if meta.editedby %}It was edited by {{ meta.editedby|join:', ' }}.{% endif %}
+{% if meta.ispartof or meta.editedby %}
+</p>
+{% endif %}
+
+{% for summary in meta.summary %}
+{% get_markdown_for summary as md meta %}
+{{ md|safe }}
+{% endfor %}
+</div>

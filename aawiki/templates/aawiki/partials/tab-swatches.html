@@ -1,0 +1,8 @@
+{% if user.is_authenticated %}
+{% if not rev %}
+<h3><a href="#">Styles</a></h3>
+<div id="tab-styles" class="aa-tab">
+{% include "aawiki/partials/swatches.html" %}
+</div>
+{% endif %}
+{% endif %}

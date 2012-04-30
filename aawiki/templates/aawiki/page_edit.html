@@ -3,50 +3,11 @@
 {% load aacoretags aawikitags %}
 
 
-{% block title %}{{ block.super }} | Editing {{ page.name }}{% endblock %}
+
+{% block title %}{% get_markdown_for content as md meta %}{{ block.super }} | Editing {{ page.name }}{% endblock %}
 
 {% block extrahead %}
-<script>
-(function($) {
-    $(document).ready(function() {
-        $("#help").accordion({
-            autoHeight: false,
-            collapsible: true
-        });
-
-        $("#accordion").accordion({ fillSpace: true });
-
-        $('body').layout({
-            applyDefaultStyles: false,
-            enableCursorHotkey: false,
-            west: {
-                size: "220",
-                fxName: "slide",
-                fxSpeed: "fast",
-                initClosed: false,
-                enableCursorHotkey: false,
-                slidable: false,
-                closable: false,
-                resizable: false,
-                togglerAlign_closed : 'center',
-                togglerAlign_open : 'center',
-                togglerContent_open: '&larr;',
-                togglerContent_closed: '&rarr;',
-                spacing_closed: 16,
-                spacing_open: 16,
-                togglerLength_open: -1,
-                togglerLength_closed: -1,
-                showOverflowOnHover: false,
-                onresize: function () {
-                    $('#accordion').accordion('resize');
-                }
-            }
-        });
-
-        $('#accordion').accordion('resize');
-    });
-})(jQuery);
-</script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
 {% endblock %}
 
 
@@ -60,79 +21,37 @@
 </div>
 {% endblock %}
 
-{% block extrasidebar %}
-    {% get_markdown_for content as md meta %}
 
-    {% if page %}{% if user.is_authenticated %}
-    <ul id="toolbar">
-        <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-        <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
-    </ul>
-    {% endif %}{% endif %}
+{% block toolbar %}
+{% if page %}
+{% if user.is_authenticated %}
+<ul id="toolbar">
+    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}
 
-    <hgroup>
-        <p>editing</p>
-    {% if meta.title %}
-        <h1 property="dc:title">{{ meta.title|first }}</h1>
-    {% else %}
-        <h1 property="dc:title">{{ page.name }}</h1>
-    {% endif %}
 
-    {% if meta.subtitle %}
-        <h2>{{ meta.subtitle|first }}</h2>
-    {% endif %}
-    </hgroup>
-    <div class="ui-layout-content">
-        <div id="accordion">
-            <h3><a href="#">Introduction</a></h3>
-            <div>
-                <div>
-                {% if meta.ispartof %}
-                <p>This page is part of the publication{{ meta.ispartof|pluralize }} 
-                {% for publication in meta.ispartof %}
-                “<a href="../{{ publication|wikify }}">{{ publication }}</a>”.</p>
-                {% endfor %}
-                {% endif %}
+{% block hgroup %}
+<hgroup>
+    <p>editing</p>
+{% if meta.title %}
+    <h1 property="dc:title">{{ meta.title|first }}</h1>
+{% else %}
+    <h1 property="dc:title">{{ page.name }}</h1>
+{% endif %}
 
-                {% if meta.with %}<p>With {{ meta.with|join:', ' }}.</p>{% endif %}
-                {% if meta.editedby %}<p>Edited by {{ meta.editedby|join:', ' }}.</p>{% endif %}
-                {% if meta.authors %}
-                <ul>{% for author in meta.authors %}<li>{{ author }}</li>{% endfor %}</ul>
-                {% endif %}
-                </div>
+{% if meta.subtitle %}
+    <h2>{{ meta.subtitle|first }}</h2>
+{% endif %}
+</hgroup>
+{% endblock %}
 
-                {% for summary in meta.summary %}
-                {% get_markdown_for summary as md meta %}
-                {{ md|safe }}
-                {% endfor %}
-            </div>
-            
-            {% if user.is_authenticated %}
-            <h3><a href="#">Help</a></h3>
-            <div id="tab-help">
-                {% include "aawiki/partials/metadata_help.html" %}
-                {% include "aawiki/partials/timecode_help.html" %}
-                {% include "aawiki/partials/filters_help.html" %}
-                {% include "aawiki/partials/markdown_help.html" %}
-            </div>
 
-            <h3><a href="#">Upload</a></h3>
-            <div id="tab-upload">
-                <form id="upload" action="/upload/" method="post" enctype="multipart/form-data">{% csrf_token %}
-                    <input type="file" value="" name="file" multiple />
-                    <button type="submit">Upload!</button>
-                </form>
-                <script>
-                // $(function() {
-                //     $('#upload').submit(function(e) {
-                //         console.log('ok');
-                //         return false;
-                //     });
-
-                // });
-                </script>
-            </div>
-            {% endif %}
-        </div>
-    </div>
+{% block tabs %}
+{% include "aawiki/partials/tab-about.html" %}
+{% include "aawiki/partials/tab-help.html" %}
+{% include "aawiki/partials/tab-upload.html" %}
 {% endblock %}

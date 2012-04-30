@@ -7,28 +7,16 @@ admin.autodiscover()
 
 
 urlpatterns = patterns('',
-    # Uncomment the admin/doc line below to enable admin documentation:
-    (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
     # Uncomment the next line to enable the admin:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
-    # (r'^docs/', include('sarmadocs.urls')),
-
     (r'^accounts/', include('registration.backends.default.urls')),
-    #(r'^uploadify/', include('uploadify.urls')),
-
-
-    #url(r'^openid/', include('django_openid_auth.urls')),
-    #url(r'^logout/', 'django.contrib.auth.views.logout_then_login', {}, 'logout'),
-
     (r'^flickr/', include('flickr.urls')),
     (r'^youtube/', include('youtube.urls')),
     (r'^ffmpeg/', include('ffmpeg.urls')),
     (r'^internetarchive/', include('internetarchive.urls')),
     (r'', include('aacore.urls')),
     (r'', include('aawiki.urls')),
-
 )
 
 if settings.DEBUG:
@@ -42,19 +30,3 @@ if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
         'document_root': settings.MEDIA_ROOT}))
-
-#from uploadify.views import upload_received
-#def upload_received_handler(sender, data, **kwargs):
-    #print('ok')
-
-    ##import pdb; pdb.set_trace()
-    #if file:
-        ## process the received file here
-        #destination = open('/home/aleray/work/aa.new/aa.wiki/run/media/uploads/%s' % data.name, 'wb+')
-
-        #destination.write(data.file.read())
-        #destination.close()
-        #print data.file
-
-
-#upload_received.connect(upload_received_handler, dispatch_uid='yourapp.whatever.upload_received')

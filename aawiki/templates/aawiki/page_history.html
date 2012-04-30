@@ -1,59 +1,16 @@
 {% extends "aawiki/base.html" %}
 
-{% load aawikitags %}
+{% load aawikitags humanize %}
 
-{% block title %}{{ block.super }} | Browsing history of {{ page.name }}{% endblock %}
+{% block title %}{% get_markdown_for page.content as md meta %}{{ block.super }} | Browsing history of {{ page.name }}{% endblock %}
 
 {% block extrahead %}
-<script>
-(function($) {
-    $(document).ready(function() {
-        $("#help").accordion({
-            autoHeight: false,
-            collapsible: true
-        });
-
-        // $("#tab-this").tabs();
-        $("#accordion").accordion({ fillSpace: true });
-
-        $('body').layout({
-            applyDefaultStyles: false,
-            enableCursorHotkey: false,
-            west: {
-                size: "220",
-                fxName: "slide",
-                fxSpeed: "fast",
-                initClosed: false,
-                enableCursorHotkey: false,
-                slidable: false,
-                closable: false,
-                resizable: false,
-                togglerAlign_closed : 'center',
-                togglerAlign_open : 'center',
-                togglerContent_open: '&larr;',
-                togglerContent_closed: '&rarr;',
-                spacing_closed: 16,
-                spacing_open: 16,
-                togglerLength_open: -1,
-                togglerLength_closed: -1,
-                showOverflowOnHover: false,
-                onresize: function () {
-                    $('#accordion').accordion('resize');
-                }
-            }
-        });
-
-        $('#accordion').accordion('resize');
-    });
-})(jQuery);
-</script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
 {% endblock %}
 
 
 {% block body %}
 <div id="page-history" class="ui-layout-center">
-<h1>History</h1>
-
     <form action='{{ page.get_diff_url }}' method="get" accept-charset="utf-8">
         <p><input type="submit" name="submit" value="Compare selected revisions" id="submit" /></p>
 
@@ -68,7 +25,8 @@
                     </dd>
                     {% endif %}
                     
-                    <dt>{{ commit.committed_date|epock2datetime|date:"jS o\f F" }}</dt>
+                    <!--<dt>{{ commit.committed_date|epock2datetime|date:"jS \o\f F" }}</dt>-->
+                    <dt>{{ commit.committed_date|epock2datetime|naturalday }}</dt>
                     <dd>
                         <ul>
                 {% endifchanged %}
@@ -102,28 +60,28 @@
 {% endblock %}
 
 
-{% block extrasidebar %}
-    {% get_markdown_for content as md meta %}
-        {% if page %}
-            {% if user.is_authenticated %}
-                <ul id="toolbar">
-                    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-                    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
-                </ul>
-            {% endif %}
-        {% endif %}
+{% block toolbar %}
+{% if page %}
+{% if user.is_authenticated %}
+<ul id="toolbar">
+    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}
 
-        <header>
-            <hgroup>
-                <p>Viewing history</p>
-                {% if meta.title %}
-                    <h1>{{ meta.title|first }}</h1>
-                {% else %}
-                    <h1>{{ page.name }}</h1>
-                {% endif %}
-                {% if meta.subtitle %}
-                    <h2>{{ meta.subtitle|first }}</h2>
-                {% endif %}
-            </hgroup>
-        </header>
+
+{% block hgroup %}
+<hgroup>
+    <p>Viewing history</p>
+    {% if meta.title %}
+        <h1>{{ meta.title|first }}</h1>
+    {% else %}
+        <h1>{{ page.name }}</h1>
+    {% endif %}
+    {% if meta.subtitle %}
+        <h2>{{ meta.subtitle|first }}</h2>
+    {% endif %}
+</hgroup>
 {% endblock %}

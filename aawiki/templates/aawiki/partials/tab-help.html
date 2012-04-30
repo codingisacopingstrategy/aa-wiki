@@ -1,0 +1,11 @@
+<h3><a href="#">Help</a></h3>
+<div id="tab-help">
+    {% if user.is_authenticated %}
+    {% include "aawiki/partials/metadata_help.html" %}
+    {% include "aawiki/partials/timecode_help.html" %}
+    {% include "aawiki/partials/filters_help.html" %}
+    {% include "aawiki/partials/markdown_help.html" %}
+    {% else %}
+    <p>Oral site works best with a recent version of Firefox. <a href="http://www.mozilla.org/en-US/firefox/new/">Download the last version</a>. We'd love to hear from you. Feel free to contact us at <a href='&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#105;&#110;&#102;&#111;&#64;&#115;&#97;&#114;&#109;&#97;&#46;&#98;&#101;'>&#105;&#110;&#102;&#111;&#64;&#115;&#97;&#114;&#109;&#97;&#46;&#98;&#101;</a> if you have troubles or want to report bugs.</p>
+    {% endif %}
+</div>

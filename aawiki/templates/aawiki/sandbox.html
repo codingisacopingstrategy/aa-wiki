@@ -1,33 +1,79 @@
- <!DOCTYPE HTML>
+{% extends "aawiki/base.html" %}
 
-{% load aacoretags %}
+{% load aawikitags typogrify_tags %}
 
-<html>
-<head>
-<title>{% block title %}active archives{% endblock %}</title>
-<style type="text/css" media="screen">
+{% block title %}{{ block.super }} | Sandbox{% endblock %}
 
-textarea {
-    width: 100%;
-    height: 300px;
-    display: block;
-}
+{% block extrahead %}
+<script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
+<script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
 
-</style>
-</head>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.sort_by_zindex.js"></script>   
+<script src="{{ STATIC_URL }}aawiki/js/jquery.caret.js"></script>   
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aalayers.js"></script>   
 
-<body>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.datetimecode.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.timeline.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.voidplayer_simple.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aamediasync.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/jquery.ui.autoscrollable.js"></script>
+
+<script src="{{ STATIC_URL }}aawiki/js/jquery.ffind.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.view.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.browser.js"></script>
+<script src="{{ STATIC_URL }}lib/iscroll/src/iscroll.js"></script>
+<script src="{{ STATIC_URL }}lib/jquery.getCSS.min.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.styles.play.css" media="screen"/>
+
+{% get_markdown_for content as md meta %}
+{% for css in meta.extra_css %}<link rel="stylesheet" href="{{ css }}" media="screen"/>{% endfor %}
+{% endblock %}
+
+{% block body %}
+<div id="sandbox" class="ui-layout-center">
+{% get_markdown_for content as md meta %}
+<article id="canvas" class="ui-layout-center
+                            {% if meta.mode %}{{ meta.mode|first }}{% endif %}
+                            {% if meta.type %}{{ meta.type|first }}{% endif %}">
+
+    <div id="wrapper">{{ md|render_aatags|safe|smartypants }}</div>
+
+    <nav id="zoom">
+    <button id="zoomin">+</button>
+    <div id="zoomslider"></div>
+    <button id="zoomout">-</button>
+    </nav>
+</article>
+</div>
+{% endblock %}
+
+
+{% block toolbar %}
+{% if page %}
+{% if user.is_authenticated %}
+<ul id="toolbar">
+    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+
+{% block hgroup %}
+<hgroup>
+    <p>Special</p>
+    <h1>Sandbox</h1>
+</hgroup>
+{% endblock %}
+
+{% block extrasidebar %}
 <form method="post" action="">{% csrf_token %}
-<textarea name="content">{{ content }}</textarea>
+<textarea name="content" style="width: 99%; margin-top: 36px; height: 200px;">{{ content }}</textarea>
 <input type="submit" />
 </form>
-
-{% if content %}
-<div>
-{{ content|aamarkdown|safe }}
-</div>
-{% endif %}
-
-</body>
-</html>
+{% endblock %}
 

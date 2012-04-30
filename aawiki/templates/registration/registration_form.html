@@ -1,0 +1,42 @@
+{% extends "aawiki/base.html" %}
+
+{% load aacoretags aawikitags %}
+
+{% block title %}{{ block.super }}Register for an account{% endblock %}
+
+{% block extrahead %}
+<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
+{% endblock %}
+
+
+{% block body %}
+<div id="registration-form" class="ui-layout-center">
+  <form action="." method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <p class="submit"><button type="submit">Submit</button></p>
+  </form>
+</div>
+{% endblock %}
+
+
+{% block toolbar %}
+{% if page %}
+{% if user.is_authenticated %}
+<ul id="toolbar">
+    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+
+{% block hgroup %}
+<hgroup>
+    <p>Special</p>
+    <h1>Register for an account</h1>
+</hgroup>
+{% endblock %}
+
+
+{% block extrasidebar %}{% endblock %}

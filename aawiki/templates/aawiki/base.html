@@ -9,16 +9,19 @@
 <head>
 {% block head %}
     <meta charset="utf-8"/>
-    <link rel="index" href="{% url aa-index %}"/>
     <title>{% block title %}active archives{% endblock %}</title>
+
+    <link rel="index" href="{% url aa-index %}"/>
+    <link rel="aa-embed" href="{% url aa-embed %}" type="text/css"/>
+
     <link rel="stylesheet" href="{% url aa-namespaces-css %}" media="screen" />
     <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/activearchives.css" type="text/css"/>
-    <link rel="aa-embed" href="{% url aa-embed %}" type="text/css"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/jquery.layout.css" type="text/css"/>
+
     <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.1.min.js"></script>
     <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.17.custom.min.js"></script>    
     <script src="{{ STATIC_URL }}lib/jquery.djangocsrf.js"></script>    
     <script src="{{ STATIC_URL }}lib/jquery.layout.js"></script>   
-    <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/jquery.layout.css" type="text/css"/>
     {% block extrahead %}{% endblock %}
 {% endblock head %}
 </head>
@@ -31,9 +34,14 @@
     </div>
 
     <nav id="sidebar" class="ui-layout-west"> 
+    {% block sidebar %}
+        {% block sitename %}
         <div id="site-name"><a title="Back to main page" href="{% url aa-index %}">Oralsite</a>
         (<a title="About Oral Site"
             href="/oralsite/pages/Oral_Site/">about</a>)</div>
+        {% endblock %}
+
+        {% block login %}
         <div id="login">
             <p>
             {% if user.is_authenticated %}
@@ -43,7 +51,32 @@
             {% endif %}
             </p>
         </div>
+        {% endblock %}
+
+        {% block toolbar %}{% endblock %}
+
+        {% block hgroup %}
+        <hgroup>
+        {% if meta.title %}
+            <h1 property="dc:title">{{ meta.title|first }}</h1>
+        {% else %}
+            <h1 property="dc:title">{{ page.name }}</h1>
+        {% endif %}
+
+        {% if meta.subtitle %}
+            <h2>{{ meta.subtitle|first }}</h2>
+        {% endif %}
+        </hgroup>
+        {% endblock %}
+
         {% block extrasidebar %}{% endblock %}
+
+        <div class="ui-layout-content">
+            <div id="accordion">
+            {% block tabs %}{% endblock %}
+            </div>
+        </diV>
+    {% endblock %}
     </nav>
-    </body>
+</body>
 </html>

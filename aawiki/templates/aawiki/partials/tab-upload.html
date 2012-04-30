@@ -1,0 +1,9 @@
+{% if user.is_authenticated %}
+<h3><a href="#">Upload</a></h3>
+<div id="tab-upload">
+    <form id="upload" action="/upload/" method="post" enctype="multipart/form-data">{% csrf_token %}
+        <input type="file" value="" name="file" multiple />
+        <button type="submit">Upload!</button>
+    </form>
+</div>
+{% endif %}

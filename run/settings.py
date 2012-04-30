@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.markup',
+    'django.contrib.humanize',
     'django.contrib.staticfiles',
     'registration',
     'typogrify',

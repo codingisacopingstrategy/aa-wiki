@@ -2,51 +2,10 @@
 
 {% load aacoretags aawikitags %}
 
-{% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
+{% block title %}{% get_markdown_for page.content as md meta %}{{ block.super }} | Comparing {{ page.name }} as edited by {{ c1.author }} at {{ c1.committed_date|epock2datetime }} and as edited by {{ c2.author }} at {{ c2.committed_date|epock2datetime }}{% endblock %}
 
 {% block extrahead %}
-<script>
-(function($) {
-    $(document).ready(function() {
-        $("#help").accordion({
-            autoHeight: false,
-            collapsible: true
-        });
-
-        // $("#tab-this").tabs();
-        $("#accordion").accordion({ fillSpace: true });
-
-        $('body').layout({
-            applyDefaultStyles: false,
-            enableCursorHotkey: false,
-            west: {
-                size: "220",
-                fxName: "slide",
-                fxSpeed: "fast",
-                initClosed: false,
-                enableCursorHotkey: false,
-                slidable: false,
-                closable: false,
-                resizable: false,
-                togglerAlign_closed : 'center',
-                togglerAlign_open : 'center',
-                togglerContent_open: '&larr;',
-                togglerContent_closed: '&rarr;',
-                spacing_closed: 16,
-                spacing_open: 16,
-                togglerLength_open: -1,
-                togglerLength_closed: -1,
-                showOverflowOnHover: false,
-                onresize: function () {
-                    $('#accordion').accordion('resize');
-                }
-            }
-        });
-
-        $('#accordion').accordion('resize');
-    });
-})(jQuery);
-</script>
+<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
 {% endblock %}
 
 
@@ -59,31 +18,37 @@
 {% endblock %}
 
 
+{% block toolbar %}
+{% if page %}
+{% if user.is_authenticated %}
+<ul id="toolbar">
+    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+</ul>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+
+{% block hgroup %}
+<hgroup>
+    <p>Comparing revisions</p>
+    {% if meta.title %}
+        <h1>{{ meta.title|first }}</h1>
+    {% else %}
+        <h1>{{ page.name }}</h1>
+    {% endif %}
+    {% if meta.subtitle %}
+        <h2>{{ meta.subtitle|first }}</h2>
+    {% endif %}
+</hgroup>
+{% endblock %}
+
+
 {% block extrasidebar %}
-        {% if page %}
-            {% if user.is_authenticated %}
-                <ul id="toolbar">
-                    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-                    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
-                </ul>
-            {% endif %}
-        {% endif %}
-        <header>
-            <hgroup>
-                <p>Comparing revisions</p>
-                {% if meta.title %}
-                    <h1>{{ meta.title|first }}</h1>
-                {% else %}
-                    <h1>{{ page.name }}</h1>
-                {% endif %}
-                {% if meta.subtitle %}
-                    <h2>{{ meta.subtitle|first }}</h2>
-                {% endif %}
-            </hgroup>
-        </header>
-        <div>
-            <br />
-            <p class="warning">This is an comparision of two revisions of this page, as edited by {{ c1.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c1 }}">{{ c1.committed_date|epock2datetime }}</a >and as edited by {{ c2.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c2 }}">{{ c2.committed_date|epock2datetime }}</a>.</p>
-            <p><del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.</p>
-        </div>
+<div>
+<br />
+<p class="warning">This is an comparision of two revisions of this page, as edited by {{ c1.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c1 }}">{{ c1.committed_date|epock2datetime }}</a >and as edited by {{ c2.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c2 }}">{{ c2.committed_date|epock2datetime }}</a>.</p>
+<p><del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.</p>
+</div>
 {% endblock %}
