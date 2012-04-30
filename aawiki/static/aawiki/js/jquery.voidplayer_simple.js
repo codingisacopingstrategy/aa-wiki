@@ -7,7 +7,8 @@
 
 	window.VoidPlayer = function (element, opts) {
         opts = $.extend({
-            duration: 3600
+            duration: 3600,
+            loop: false
         }, opts);
 
 		this.element = element;
@@ -15,6 +16,7 @@
         this.paused = true;
         this.duration = opts.duration;
         this.currentTime = 0;
+        this.loop = opts.loop;
 
         /* Void player is always ready ! */
         this.readyState = 4;
@@ -39,7 +41,13 @@
             this.start = new Date().getTime() - (this.currentTime * 1000);
             this.interval_id = window.setInterval(function () {
                 var now = new Date();
-                that.currentTime = (now-that.start)/1000;
+                var nextTime = (now - that.start) / 1000;
+                if (nextTime > that.duration) {
+                    that.currentTime = 0;
+                    if (!that.loop) { that.pause(); };
+                } else {
+                    that.currentTime = nextTime;
+                };
                 that.$element.trigger("timeupdate");
             }, 250);
             // THIS MUST BE AT THE END (TO AVOID UNSTABLE/RACE CONDITIONS)
