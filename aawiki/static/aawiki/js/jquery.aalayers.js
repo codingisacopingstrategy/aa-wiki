@@ -72,7 +72,7 @@
 
     function _populate(data) {
         data.$container.find('ul').empty();
-        $(data.selector).sort_by_zindex({reverse: true})
+        $(data.selector).sortByZIndex({reverse: true})
             .each(function() {
                 var $this = $(this);
                 var $h1 = $this.find('h1').clone();
@@ -115,7 +115,7 @@
 
     $.fn.aalayers = function (method) {
         /*
-         * Depends on jquery.sort_by_zindex.js
+         * Depends on jquery.sortByZIndex.js
          */
         // Method calling logic
         if ( methods[method] ) {

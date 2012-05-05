@@ -80,11 +80,22 @@
 
 
     VoidPlayer.prototype.setCurrentTime = function (t) {
+        var browser = $.browser;
+
         this.currentTime = t;
         this.start = new Date().getTime() - (this.currentTime * 1000);
-        this.$element.trigger("seeking");
-        this.$element.trigger("timeupdate");
-        this.$element.trigger("seeked");
+
+        if (browser.webkit) {
+            this.$element.trigger("seeked");
+            this.$element.trigger("timeupdate");
+            this.$element.trigger("seeking");
+        } else {
+            this.$element.trigger("seeking");
+            this.$element.trigger("timeupdate");
+            this.$element.trigger("seeked");
+            this.$element.trigger("canplay");
+            this.$element.trigger("canplaythrough");
+        };
     }
 
 })(jQuery);

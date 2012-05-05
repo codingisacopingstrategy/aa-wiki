@@ -18,15 +18,16 @@
 
 
 (function($) {
+    /**
+     * function jQuery.fn.sortByZIndex (options)
+     *
+     * Takes a jquery collection and sorts its elements according to their z-index.
+     * Returns the sorted collection
+     *    
+     *    >>> $('section').sort_by_zindex();
+     *    >>> $('section').sort_by_zindex({reverse: true});
+     */
     $.fn.sort_by_zindex = function (options) {
-        /*
-         * Takes a jquery collection and sorts its elements according to their z-index.
-         * Returns the sorted collection
-         *    
-         *    >>> $('section').sort_by_zindex();
-         *    >>> $('section').sort_by_zindex({reverse: true});
-         */
-
         var opts = $.extend({}, $.fn.sort_by_zindex.defaults, options);
 
         var Elts = $(this).toArray()
