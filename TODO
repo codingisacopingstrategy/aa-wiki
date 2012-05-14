@@ -119,3 +119,6 @@ Meeting Skyope long-court 27/04/2012
 ====================================
 
 - Scroll personalisé
+
+
+Bug: les messages de commits ne peuvent etre qu'ascii

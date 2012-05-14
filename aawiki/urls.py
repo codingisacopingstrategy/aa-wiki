@@ -35,8 +35,8 @@ urlpatterns = patterns('aawiki.views',
 
 
 v1_api = Api(api_name='v1')
-#v1_api.register(PageResource())
 v1_api.register(SectionResource())
+v1_api.register(PageResource())
 
 urlpatterns += patterns('',
     (r'^api/', include(v1_api.urls)),
