@@ -24,11 +24,11 @@
      * Takes a jquery collection and sorts its elements according to their z-index.
      * Returns the sorted collection
      *    
-     *    >>> $('section').sort_by_zindex();
-     *    >>> $('section').sort_by_zindex({reverse: true});
+     *    >>> $('section').sortByZIndex();
+     *    >>> $('section').sortByZIndex({reverse: true});
      */
-    $.fn.sort_by_zindex = function (options) {
-        var opts = $.extend({}, $.fn.sort_by_zindex.defaults, options);
+    $.fn.sortByZIndex = function (options) {
+        var opts = $.extend({}, $.fn.sortByZIndex.defaults, options);
 
         var Elts = $(this).toArray()
             .sort(function (a, b) {
@@ -42,7 +42,7 @@
         return $(Elts);
     };
 
-    $.fn.sort_by_zindex.defaults = {
+    $.fn.sortByZIndex.defaults = {
         reverse: false,
     };
 })(jQuery);
