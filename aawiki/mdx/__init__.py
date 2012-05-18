@@ -58,12 +58,27 @@ def aa_make_link(rel, target, label):
     return a
 
 
+def aa_make_elt (rel, target, label):
+     if rel == "dc:title":
+         elt = markdown.util.etree.Element('cite')
+     else:
+         elt = markdown.util.etree.Element('span')
+     elt.set('content', target)
+     elt.text = label or target
+     if rel:
+         elt.set('property', rel)
+     return elt
+
+
 def get_markdown(simple=False):
     """
     Returns a Markdown instance with the appropriate extensions for active
     archives wiki.
     """
-    extension_configs = {'semanticwikilinks': [('make_link', aa_make_link)]}
+    extension_configs = {
+        'semanticwikilinks': [('make_link', aa_make_link)],
+        'semanticdata': [('make_elt', aa_make_elt)],
+    }
     extensions = ["attr_list", "cite", "def_list", "del_ins", "semanticdata",
             "semanticwikilinks", mdx_timecodes.makeExtension()]
 
