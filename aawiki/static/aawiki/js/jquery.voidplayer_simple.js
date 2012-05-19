@@ -171,6 +171,7 @@ Number.prototype.secondsTo = function (outputFormat) {
 			if (outputFormat != 'mm:ss') {
 				hh = Math.floor(time / 3600);
 				time = time - (hh * 3600);
+                hh = (hh < 10) ? ("0" + hh) : hh; // forces two digits hours
 				hh += ':';
 			}
 

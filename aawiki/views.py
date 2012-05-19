@@ -372,6 +372,7 @@ def page_edit(request, slug):
                     page.commit(message=message, author=author, is_minor=is_minor)
 
             if is_ajax:
+                # FIXME: apply typogrify filters here too!
                 md = get_markdown()
                 rendered = md.convert(content)
                 return HttpResponse(rendered)
