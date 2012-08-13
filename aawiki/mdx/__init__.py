@@ -20,7 +20,7 @@ from aawiki.utils import url_for_pagename
 import urlparse
 
 
-def aa_make_link(rel, target, label):
+def aa_make_link(md, rel, target, label):
     a = etree.Element('a')
 
     # FIXME: This was added to give anchor support within a wiki page.
@@ -58,7 +58,7 @@ def aa_make_link(rel, target, label):
     return a
 
 
-def aa_make_elt (rel, target, label):
+def aa_make_elt (md, rel, target, label):
      if rel == "dc:title":
          elt = markdown.util.etree.Element('cite')
      else:
