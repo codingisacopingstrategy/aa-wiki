@@ -1,6 +1,6 @@
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
-from aacore.rdfutils import *
+from rdfutils import *
 from aawiki.utils import (full_site_url, pagename_for_url)
 from aawiki.models import Page
 from aacore import RDF_MODEL

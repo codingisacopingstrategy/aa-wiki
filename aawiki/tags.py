@@ -8,7 +8,7 @@ import re
 import os
 from aawiki.utils import dewikify
 import aacore.utils 
-from aacore.rdfutils import query
+from rdfutils import query
 from urlparse import urlparse
 from aacore import RDF_MODEL
 

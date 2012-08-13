@@ -22,7 +22,7 @@ import html5lib
 import lxml
 import lxml.cssselect
 import re
-from aacore import rdfutils
+import rdfutils
 import subprocess
 import os.path
 import feedparser

@@ -20,8 +20,8 @@ from django.contrib.auth.models import User
 
 from aacore.models import reindex_request
 import aawiki.utils
-from aacore import rdfutils
-from aacore.rdfutils import (rdfnode, prep_uri)
+import rdfutils
+from rdfutils import (rdfnode, prep_uri)
 from aacore.settings import (CACHE_DIR, CACHE_URL)
 from aacore import resource_opener
 from aawiki.settings import GIT_DIR
