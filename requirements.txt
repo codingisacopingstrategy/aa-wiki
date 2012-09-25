@@ -5,7 +5,7 @@ mdx-cite==1.0
 mdx-del-ins==1.0
 mdx-outline==1.02
 mdx-semanticdata==1.0
-mdx-semanticwikilinks==1.0
+mdx-semanticwikilinks==1.1
 PyYAML==3.09
 async==0.6.1
 diff-match-patch==20110725.1
@@ -23,3 +23,4 @@ virtualenv==1.6.4
 wsgiref==0.1.2
 django-typogrify==1.2.2
 django-registration==0.8
+git+git://git.constantvzw.org/aa.rdfutils.git
