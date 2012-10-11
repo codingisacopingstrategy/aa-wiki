@@ -3,34 +3,15 @@ Implements active archives models
 """
 
 
-import re
-import RDF
 import codecs
 import os
 import os.path
-import urllib2
 from git import Repo, NoSuchPathError
-import cStringIO
-from ConfigParser import ConfigParser
-
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from django.contrib.auth.models import User
-
 from aacore.models import reindex_request
 import aawiki.utils
-import rdfutils
-from rdfutils import (rdfnode, prep_uri)
-from aacore.settings import (CACHE_DIR, CACHE_URL)
-from aacore import resource_opener
 from aawiki.settings import GIT_DIR
-from django.conf import settings
 from diff_match_patch import diff_match_patch
-
-from django.db.models.signals import (post_save, post_delete, m2m_changed)
-import django.dispatch
-
 
 
 class Page(models.Model):

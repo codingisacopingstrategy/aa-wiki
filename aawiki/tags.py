@@ -1,13 +1,10 @@
 """
-Code is derived fro/mm
+Code is derived from
 http://effbot.org/zone/django-simple-template.htm
 """
 
 
 import re
-import os
-from aawiki.utils import dewikify
-import aacore.utils 
 from rdfutils import query
 from urlparse import urlparse
 from aacore import RDF_MODEL

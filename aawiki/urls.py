@@ -1,5 +1,4 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import (redirect_to, direct_to_template)
 
 
 urlpatterns = patterns('aawiki.views',
@@ -24,9 +23,3 @@ urlpatterns = patterns('aawiki.views',
     ### SANDBOX
     url(r'^sandbox/$', 'sandbox', {}, name='aa-sandbox'),
 )
-
-### LOGIN ###
-#urlpatterns += patterns('django.contrib.auth.views',
-    #url(r'^accounts/login/$', 'login', {'template_name': 'aawiki/login.html'}, name='aa-login'),
-    #url(r'^accounts/logout/$', 'logout', {'template_name': 'aawiki/logout.html'}, name='aa-logout'),
-#)
