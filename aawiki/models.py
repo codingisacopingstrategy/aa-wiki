@@ -8,10 +8,11 @@ import os
 import os.path
 from git import Repo, NoSuchPathError
 from django.db import models
-from aacore.models import reindex_request
+from aacore.sniffers import AAResource
 import aawiki.utils
 from aawiki.settings import GIT_DIR
 from diff_match_patch import diff_match_patch
+from aawiki.mdx import get_markdown
 
 
 class Page(models.Model):
@@ -93,9 +94,12 @@ class Page(models.Model):
 #        output = cStringIO.StringIO()
 #        config.write(output)
 #        repo.git.notes(["add", "--message=%s" % output.getvalue()], ref="metadata")
-
         self.save()
-        reindex_request.send(sender=self.__class__, instance=self)
+        from django.contrib.sites.models import Site
+        current_site = Site.objects.get_current()
+        print(current_site.domain)
+        print("reindexing page %s" % self.name)
+        AAResource("http://localhost:8000" + self.get_absolute_url()).index()
 
     def get_commit(self, rev="HEAD"):
         """

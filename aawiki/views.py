@@ -28,11 +28,12 @@ from django.template.loader import (render_to_string, get_template)
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
-from aacore.models import (Namespace, Resource)
+from aacore.models import Namespace
+#from aacore.models import (Namespace, Resource)
 
 from aawiki.filters import *
 from aawiki.models import *
-from aacore.utils import add_resource
+#from aacore.utils import add_resource
 from aawiki.utils import (dewikify, convert_line_endings)
 from aawiki.mdx import get_markdown
 from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace, 
@@ -53,7 +54,8 @@ def embed (request):
     # ALLOW (authorized users) to trigger a resource to be added...
     if url.startswith("http://"):
         # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
-        add_resource(url, RDF_MODEL, request)
+        #add_resource(url, RDF_MODEL, request)
+        pass
 
     ### APPLY FILTERS (if any)
     pipeline = request.REQUEST.get("filter", "embed").strip()
@@ -64,8 +66,8 @@ def embed (request):
 
     stdin = {
         'original_url': url,
-        'local_url': Resource.objects.get(url=url).get_local_url(),
-        'local_path': Resource.objects.get(url=url).get_local_file(),
+        #'local_url': Resource.objects.get(url=url).get_local_url(),
+        #'local_path': Resource.objects.get(url=url).get_local_file(),
         'output': 'None',
         'extra_css': [],
         'extra_js': [],

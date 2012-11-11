@@ -105,6 +105,23 @@ class AAAnnotations(AATag):
         return "".join(foo)
 
 
+class AAAuthors(AATag):
+    name = "authors"
+
+    def run(self):
+        print self.args
+        ret = query("""
+                SELECT DISTINCT ?object ?subject WHERE { 
+                    ?object <http://activearchives.org/terms/author> ?subject . 
+                    FILTER (REGEX(?subject, "^%s"))
+                }""" % self.args[0], RDF_MODEL)
+        foo = ["<ul>"]
+        for i in ret:
+            foo.append("<li><a href='%s'>%s</a></li>" % (str(i['object']), str(i['subject'])))
+        foo.append("</ul>")
+        return "".join(foo)
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

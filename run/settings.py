@@ -102,20 +102,15 @@ INSTALLED_APPS = (
     'registration',
     'typogrify',
     'aacore',
-    'flickr',
-    'youtube',
-    'ffmpeg',
-    'internetarchive',
     'aawiki',
-    #'uploadify',
 )
 
 ###################
 # AA
 ###################
 
-AA_RDF_STORAGE_DIR = DIRNAME
-AA_INDEXED_MODELS = ("aacore.models.Resource", "aawiki.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
+#AA_RDF_STORAGE_DIR = DIRNAME
+#AA_INDEXED_MODELS = ("aacore.models.Resource", "aawiki.models.Page", "aacore.models.RDFDelegate", "flickr.models.Photo", "youtube.models.Video", "internetarchive.models.Asset", "ffmpeg.models.Media")
 # SITE_URL = "http://localhost:8000"
 
 ACCOUNT_ACTIVATION_DAYS = 7
