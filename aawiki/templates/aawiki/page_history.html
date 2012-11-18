@@ -2,7 +2,7 @@
 
 {% load aawikitags humanize %}
 
-{% block title %}{% get_markdown_for page.content as md meta %}{{ block.super }} | Browsing history of {{ page.name }}{% endblock %}
+{% block title %}{% get_markdown_for content as md meta %}{{ block.super }} | Browsing history of {{ slug }}{% endblock %}
 
 {% block extrahead %}
 <script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
@@ -11,39 +11,29 @@
 
 {% block body %}
 <div id="page-history" class="ui-layout-center">
-    <form action='{{ page.get_diff_url }}' method="get" accept-charset="utf-8">
-        <p><input type="submit" name="submit" value="Compare selected revisions" id="submit" /></p>
+    <form action="{% url aawiki:page-diff slug %}" method="get" accept-charset="utf-8">
+        <p><input type="submit" value="Compare selected revisions" id="submit" /></p>
 
         <dl id="commits">
             
-            {% for commit in page.iter_commits %}
+            {% for commit in commits %}
             
-                {% ifchanged commit.committed_date|epock2datetime|date:"F" %}
+                {% ifchanged commit.commit_time|fromtimestamp|date %}
                 
                     {% if not forloop.first %}
                         </ul>
                     </dd>
                     {% endif %}
                     
-                    <!--<dt>{{ commit.committed_date|epock2datetime|date:"jS \o\f F" }}</dt>-->
-                    <dt>{{ commit.committed_date|epock2datetime|naturalday }}</dt>
+                    <dt>{{ commit.commit_time|fromtimestamp|naturalday }}</dt>
                     <dd>
                         <ul>
                 {% endifchanged %}
 
                             <li>
-                                <input type="radio" name="c1" value="{{ commit.hexsha }}" />
-                                <input type="radio" name="c2" value="{{ commit.hexsha }}" />
-                                {{ commit.committed_date|epock2datetime|date:'H:i' }} by {{ commit.author }} <a href="{{ page.get_absolute_url }}?rev={{ commit.hexsha }}">{{ commit.message }}</a>
-                                <!--<dl class="commit">-->
-                                    <!--<dt>Commit message</dt>-->
-                                    <!--<dd class="commit-message"><a href="{{ page.get_absolute_url }}?rev={{ commit.hexsha }}">{{ commit.message }}</a></dd>-->
-                                    <!--<dt>Author</dt>-->
-                                    <!--<dd class="commit-author">by {{ commit.author }}</dd>-->
-                                    <!--[><dt>Stats</dt><]-->
-                                    <!--[> <dt>Technical Specifications</dt> <]-->
-                                    <!--[> <dd class="commit-details"><a href='#'>view details</a></dd> <]-->
-                                <!--</dl>-->
+                                <input type="radio" name="c1" value="{{ commit.hex }}" />
+                                <input type="radio" name="c2" value="{{ commit.hex }}" />
+                                {{ commit.commit_time|fromtimestamp|date:'H:i' }} by {{ commit.author.name }} <a href="{% url aawiki:page-detail slug %}?hex={{ commit.hex }}">{{ commit.message }}</a>
                             </li>
                             
                 {% if forloop.last %}
@@ -54,20 +44,18 @@
             {% endfor %}
             
         </dl>
-        <p><input type="submit" name="submit" value="Compare selected revisions" id="submit" /></p>
+        <p><input type="submit" value="Compare selected revisions" id="submit" /></p>
     </form>
 </div>
 {% endblock %}
 
 
 {% block toolbar %}
-{% if page %}
 {% if user.is_authenticated %}
 <ul id="toolbar">
-    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+    <li><a id="view" title="View the page" href="{% url aawiki:page-detail slug %}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{% url aawiki:page-edit slug %}">Edit</a></li>
 </ul>
-{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -78,7 +66,7 @@
     {% if meta.title %}
         <h1>{{ meta.title|first }}</h1>
     {% else %}
-        <h1>{{ page.name }}</h1>
+        <h1>{{ slug }}</h1>
     {% endif %}
     {% if meta.subtitle %}
         <h2>{{ meta.subtitle|first }}</h2>

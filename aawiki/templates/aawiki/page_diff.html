@@ -2,10 +2,19 @@
 
 {% load aacoretags aawikitags %}
 
-{% block title %}{% get_markdown_for page.content as md meta %}{{ block.super }} | Comparing {{ page.name }} as edited by {{ c1.author }} at {{ c1.committed_date|epock2datetime }} and as edited by {{ c2.author }} at {{ c2.committed_date|epock2datetime }}{% endblock %}
+{% block title %}{% get_markdown_for content as md meta %}{{ block.super }} | Comparing {{ slug }} as edited by {{ c1.author.name }} at {{ c1.commit_time|fromtimestamp }} and as edited by {{ c2.author.name }} at {{ c2.commit_time|fromtimestamp }}{% endblock %}
 
 {% block extrahead %}
 <script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/toastr/toastr.css" type="text/css"/>
+<script src="{{ STATIC_URL }}lib/toastr/toastr.js"></script>
+<script>
+$(function() {
+    toastr.warning('<del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.');
+    toastr.warning('This is an comparision of two revisions of this page, as edited by {{ c1.author.name }} at <a href="{% url aawiki:page-detail slug %}?rev={{ c1 }}">{{ c1.commit_time|fromtimestamp }}</a >and as edited by {{ c2.author.name }} at <a href="{% url aawiki:page-detail slug %}?rev={{ c2 }}">{{ c2.commit_time|fromtimestamp}}</a>');
+});
+</script>
 {% endblock %}
 
 
@@ -19,13 +28,11 @@
 
 
 {% block toolbar %}
-{% if page %}
 {% if user.is_authenticated %}
 <ul id="toolbar">
-    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
+    <li><a id="view" title="View the page" href="{% url aawiki:page-detail slug %}">View</a></li>
+    <li><a id="edit" title="Edit the full page" href="{% url aawiki:page-edit slug %}">Edit</a></li>
 </ul>
-{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -36,7 +43,7 @@
     {% if meta.title %}
         <h1>{{ meta.title|first }}</h1>
     {% else %}
-        <h1>{{ page.name }}</h1>
+        <h1>{{ slug }}</h1>
     {% endif %}
     {% if meta.subtitle %}
         <h2>{{ meta.subtitle|first }}</h2>
@@ -48,7 +55,7 @@
 {% block extrasidebar %}
 <div>
 <br />
-<p class="warning">This is an comparision of two revisions of this page, as edited by {{ c1.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c1 }}">{{ c1.committed_date|epock2datetime }}</a >and as edited by {{ c2.author }} at <a href="{{ page.get_absolute_url }}?rev={{ c2 }}">{{ c2.committed_date|epock2datetime }}</a>.</p>
+<p class="warning">This is an comparision of two revisions of this page, as edited by {{ c1.author.name }} at <a href="{% url aawiki:page-detail slug %}?rev={{ c1 }}">{{ c1.commit_time|fromtimestamp }}</a >and as edited by {{ c2.author.name }} at <a href="{% url aawiki:page-detail slug %}?rev={{ c2 }}">{{ c2.commit_time|fromtimestamp}}</a>.</p>
 <p><del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.</p>
 </div>
 {% endblock %}

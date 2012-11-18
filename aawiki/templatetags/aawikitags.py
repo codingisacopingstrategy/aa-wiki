@@ -12,6 +12,11 @@ register = template.Library()
 
 
 @register.filter
+def fromtimestamp(value):
+    return datetime.fromtimestamp(value)
+
+
+@register.filter
 def epock2datetime(value):
     return datetime(*time.gmtime(value)[:6])
 

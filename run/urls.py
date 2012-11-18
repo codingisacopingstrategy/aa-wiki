@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^accounts/', include('registration.backends.default.urls')),
     (r'', include('aacore.urls')),
-    (r'', include('aawiki.urls')),
+    (r'', include('aawiki.urls', namespace="aawiki", app_name="aawiki")),
 )
 
 if settings.DEBUG:

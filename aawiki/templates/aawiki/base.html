@@ -11,10 +11,10 @@
     <meta charset="utf-8"/>
     <title>{% block title %}active archives{% endblock %}</title>
 
-    <link rel="index" href="{% url aa-index %}"/>
-    <link rel="aa-embed" href="{% url aa-embed %}" type="text/css"/>
+    <link rel="index" href="{% url aawiki:page-index %}"/>
+    <link rel="aa-embed" href="{% url aawiki:embed %}" type="text/css"/>
 
-    <link rel="stylesheet" href="{% url aa-namespaces-css %}" media="screen" />
+    <link rel="stylesheet" href="{#{% url aawiki:namespaces-css %}#}" media="screen" />
     <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/activearchives.css" type="text/css"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/jquery.layout.css" type="text/css"/>
 
@@ -36,7 +36,7 @@
     <nav id="sidebar" class="ui-layout-west"> 
     {% block sidebar %}
         {% block sitename %}
-        <div id="site-name"><a title="Back to main page" href="{% url aa-index %}">Oralsite</a>
+        <div id="site-name"><a title="Back to main page" href="{% url aawiki:page-index %}">Oralsite</a>
         (<a title="About Oral Site"
             href="/oralsite/pages/Oral_Site/">about</a>)</div>
         {% endblock %}

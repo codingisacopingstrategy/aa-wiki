@@ -2,7 +2,7 @@
 
 {% load aacoretags aawikitags typogrify_tags %}
 
-{% block title %}{{ block.super }} | {{ page.name }}{% endblock %}
+{% block title %}{{ block.super }} | {{ slug }}{% endblock %}
 
 {% block extrahead %}
 <script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
@@ -30,6 +30,19 @@
 
 {% get_markdown_for content as md meta %}
 {% for css in meta.extra_css %}<link rel="stylesheet" href="{{ css }}" media="screen"/>{% endfor %}
+
+{% comment %}
+{% if hex %}
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/toastr/toastr.css" type="text/css"/>
+<script src="{{ STATIC_URL }}lib/toastr/toastr.js"></script>
+<script>
+$(function() {
+    toastr.warning('<del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.');
+});
+{% endif %}
+</script>
+{% endcomment %}
+
 {% endblock %}
 
 
@@ -68,18 +81,16 @@
 
 
 {% block toolbar %}
-{% if page %}
 {% if user.is_authenticated %}
 <ul id="toolbar">
     {% if rev %}
-    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
+    <li><a id="view" title="View the page" href="{% url aawiki:page-detail slug %}">View</a></li>
     {% endif %}
-    <li><a id="edit" title="Edit the full page" href="{{ page.get_edit_url }}">Edit</a></li>
-    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+    <li><a id="edit" title="Edit the full page" href="{% url aawiki:page-edit slug %}">Edit</a></li>
+    <li><a id="history" title="Browse this page history" href="{% url aawiki:page-history slug %}">History</a></li>
     <li><a id="add" title="Add an annotation" href="#">Add</a></li>
     <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
 </ul>
-{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -88,7 +99,7 @@
 {% if meta.title %}
     <h1 property="dc:title">{{ meta.title|first }}</h1>
 {% else %}
-    <h1 property="dc:title">{{ page.name }}</h1>
+    <h1 property="dc:title">{{ slug }}</h1>
 {% endif %}
 
 {% if meta.subtitle %}

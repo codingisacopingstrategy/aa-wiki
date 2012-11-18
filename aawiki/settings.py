@@ -21,3 +21,4 @@ import os.path
 
 
 GIT_DIR = getattr(settings, 'AA_GIT_DIR', os.path.join(settings.DIRNAME, "repositories"))
+REPO_PATH = getattr(settings, 'AA_REPO_PATH', os.path.join(settings.DIRNAME, "repo"))

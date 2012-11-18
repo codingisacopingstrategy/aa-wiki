@@ -4,7 +4,7 @@
 
 
 
-{% block title %}{% get_markdown_for content as md meta %}{{ block.super }} | Editing {{ page.name }}{% endblock %}
+{#{% block title %}{% get_markdown_for content as md meta %}{{ block.super }} | Editing {{ page.name }}{% endblock %}#}
 
 {% block extrahead %}
 <script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
@@ -16,20 +16,18 @@
 <form id='edit-all' action="." method="post" accept-charset="utf-8">{% csrf_token %}
     {% if section %}<input type="hidden" name="section" value="{{ section }}" />{% endif %}
     {{ form.as_p }}
-    <p><input type="submit" value="✔ Save" />{% if page %}<input name="cancel" type="submit" value="✘ Cancel" />{% endif %}</p>
+    <p><input type="submit" value="✔ Save" />{# if page #}<input name="cancel" type="submit" value="✘ Cancel" />{# endif #}</p>
 </form>
 </div>
 {% endblock %}
 
 
 {% block toolbar %}
-{% if page %}
 {% if user.is_authenticated %}
 <ul id="toolbar">
-    <li><a id="view" title="View the page" href="{{ page.get_absolute_url }}">View</a></li>
-    <li><a id="history" title="Browse this page history" href="{{ page.get_history_url }}">History</a></li>
+    <li><a id="view" title="View the page" href="{% url aawiki:page-detail slug %}">View</a></li>
+    <li><a id="history" title="Browse this page history" href="{% url aawiki:page-history slug %}">History</a></li>
 </ul>
-{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -40,7 +38,7 @@
 {% if meta.title %}
     <h1 property="dc:title">{{ meta.title|first }}</h1>
 {% else %}
-    <h1 property="dc:title">{{ page.name }}</h1>
+    <h1 property="dc:title">{{ slug }}</h1>
 {% endif %}
 
 {% if meta.subtitle %}

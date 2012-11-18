@@ -28,7 +28,7 @@ from django.core.urlresolvers import reverse
 
 def url_for_pagename(name):
     """ Convenience function to map a name to a page (partial) URL """
-    return reverse('aa-page-detail', args=[wikify(name)])
+    return reverse('aawiki:page-detail', args=[wikify(name)])
 
 def pagename_for_url(url):
     """ Convenience function to map a name to a page (partial) URL """
