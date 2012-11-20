@@ -14,7 +14,7 @@ REST API
 
 
 from django.conf.urls.defaults import url
-from tastypie import fields, http
+from tastypie import fields
 from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
@@ -27,13 +27,12 @@ import time
 from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 from aawiki.utils import convert_line_endings
 from aawiki.settings import REPO_PATH
-from pygit2 import GIT_OBJ_BLOB, GIT_SORT_TIME, Repository, Signature, init_repository
+from pygit2 import GIT_OBJ_BLOB, Repository, Signature
 
 try: import simplejson as json
 except ImportError: import json
 
 
-# a dummy class representing a page of data
 class Page(object):
     repo = Repository(REPO_PATH)
 
@@ -92,14 +91,9 @@ class Page(object):
 
 
 class PageResource(Resource):
-    # fields must map to the attributes in the Page class
     name = fields.CharField(attribute='name')
     content = fields.CharField(attribute='content')
     revision = fields.CharField(attribute='revision', readonly=True)
-
-    #hex = fields.CharField(attribute='revision', readonly=True)
-    #message = fields.CharField(attribute='revision', readonly=True)
-    #author = fields.CharField(attribute='revision', readonly=True)
     
     class Meta:
         resource_name = 'page'
@@ -108,11 +102,6 @@ class PageResource(Resource):
         authorization = Authorization()
 
     def base_urls(self):
-        """
-        The standard URLs this ``Resource`` should respond to.
-        """
-        # Due to the way Django parses URLs, ``get_multiple`` won't work without
-        # a trailing slash.
         return [
             url(r"^(?P<resource_name>%s)%s$" % (self._meta.resource_name, trailing_slash()), 
                 self.wrap_view('dispatch_list'), name="api_dispatch_list"),
@@ -124,14 +113,13 @@ class PageResource(Resource):
                 self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
-    # adapted this from ModelResource
     def get_resource_uri(self, bundle_or_obj):
         kwargs = {
             'resource_name': self._meta.resource_name,
         }
 
         if isinstance(bundle_or_obj, Bundle):
-            kwargs['name'] = bundle_or_obj.obj.name # name is referenced in ModelResource
+            kwargs['name'] = bundle_or_obj.obj.name
         else:
             kwargs['name'] = bundle_or_obj.name
         
@@ -194,7 +182,6 @@ class PageResource(Resource):
         except KeyError:
             raise NotFound("Object not found") 
 
-        #import ipdb; ipdb.set_trace()
         request.DELETE = json.loads(request.raw_post_data)
         message = request.DELETE.get("message") or "<no messages>"
         user = request.user.username if request.user.username else "anonymous"
@@ -221,8 +208,9 @@ class SectionObject(object):
 
 
 class SectionResource(Resource):
-    header = fields.CharField(attribute='header')
-    body = fields.CharField(attribute='body')
+    content = fields.CharField(attribute='content')
+    header = fields.CharField(attribute='header', readonly=True)
+    body = fields.CharField(attribute='body', readonly=True)
     index = fields.IntegerField(attribute='index', readonly=True)
     start = fields.IntegerField(attribute='start', readonly=True)
     end = fields.IntegerField(attribute='end', readonly=True)
@@ -234,11 +222,6 @@ class SectionResource(Resource):
         authorization = Authorization()
 
     def base_urls(self):
-        """
-        The standard URLs this ``Resource`` should respond to.
-        """
-        # Due to the way Django parses URLs, ``get_multiple`` won't work without
-        # a trailing slash.
         return [
             url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_list'), name="api_dispatch_list"),
             url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/schema%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('get_schema'), name="api_get_schema"),
@@ -246,19 +229,11 @@ class SectionResource(Resource):
             url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/(?P<pk>\d+)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
-        ##/pages/Index/sections/
-        ##/pages/Index/sections/schema/
-        ##/pages/Index/sections/set/1;3
-        ##/pages/Index/sections/1/
-
-    # adapted this from ModelResource
     def get_resource_uri(self, bundle_or_obj):
-        kwargs = {
-            'resource_name': self._meta.resource_name,
-        }
+        kwargs = {'resource_name': self._meta.resource_name}
 
         if isinstance(bundle_or_obj, Bundle):
-            kwargs['name'] = bundle_or_obj.obj.name # name is referenced in ModelResource
+            kwargs['name'] = bundle_or_obj.obj.name
         else:
             kwargs['name'] = bundle_or_obj.name
         
@@ -268,10 +243,11 @@ class SectionResource(Resource):
         return self._build_reverse_url('aawiki:api_dispatch_detail', kwargs=kwargs)
 
     def get_object_list(self, request, **kwargs):
+        hex = request.GET.get('hex') if request else None
         name = kwargs['parent_name']
 
         try:
-            page = Page.get(name)
+            page = Page.get(name, hex=hex)
         except KeyError:
             raise NotFound("Object not found") 
 
@@ -279,54 +255,49 @@ class SectionResource(Resource):
 
     def obj_get_list(self, request=None, **kwargs):
         return self.get_object_list(request, **kwargs)
-
+    
     def obj_get(self, request=None, **kwargs):
-        # get one object from data source
+        hex = request.GET.get('hex') if request else None
         name = kwargs['parent_name']
+
         try:
-            page = Page.get(name)
+            page = Page.get(name, hex=hex)
         except KeyError:
             raise NotFound("Object not found") 
 
-        section = sectionalize(page.content)[int(kwargs['pk'])]
+        try:
+            section = sectionalize(page.content)[int(kwargs['pk'])]
+        except IndexError:
+            raise NotFound("Object not found") 
+
         return SectionObject(section)
 
     def obj_create(self, bundle, request=None, **kwargs):
         raise NotImplementedError()
 
     def obj_update(self, bundle, request=None, **kwargs):
-        bundle.obj = SectionObject(initial=kwargs)
+        name = kwargs['parent_name']
+
         bundle = self.full_hydrate(bundle)
 
-        #page = self._meta.queryset.get(name=kwargs['name'])
-        page = self._meta.queryset.get(name='Index')
-        page.content = sectionalize_replace(page.content, int(kwargs['pk']), "bla")
-        page.save()
+        try:
+            page = Page.get(name)
+        except KeyError:
+            raise NotFound("Object not found") 
+
+        try:
+            page.content = sectionalize_replace(page.content, int(kwargs['pk']), bundle.obj.content)
+        except IndexError:
+            raise NotFound("Object not found") 
+
+
+
+
+        #page = PageResource()
+        #bundle = page.build_bundle(request=request, data=form.data.dict())
+
+        #try:
+            #page.obj_update(bundle, request=request, name=slug)
+        #except NotFound:
+
         return bundle
-
-    #def obj_delete_list(self, request=None, **kwargs):
-        #bucket = self._bucket()
-
-        #for key in bucket.get_keys():
-            #obj = bucket.get(key)
-            #obj.delete()
-
-    #def obj_delete(self, request=None, **kwargs):
-        #bucket = self._bucket()
-        #obj = bucket.get(kwargs['pk'])
-        #obj.delete()
-
-    #def rollback(self, bundles):
-        #pass
-    def get_multiple(self, request, **kwargs):
-        """
-        Returns a serialized list of resources based on the identifiers
-        from the URL.
-
-        Calls ``obj_get`` to fetch only the objects requested. This method
-        only responds to HTTP GET.
-
-        Should return a HttpResponse (200 OK).
-        """
-        # TODO: implement. Should call obj_get method with kwargs pk and *name*.
-        return http.HttpNotImplemented()

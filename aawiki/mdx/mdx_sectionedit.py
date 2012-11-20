@@ -269,7 +269,7 @@ def sectionalize(text, sections=None, offset=0):
         ...     assert txt1 == txt2
     """
     if sections is None:
-        sections = [dict(header='', body=text, start=0, end=len(text), index=0)]
+        sections = [dict(header='', body=text, content=text, start=0, end=len(text), index=0)]
 
     pattern = re.compile(HASH_OR_DATETIMECODE_HEADER_RE % '1,6', re.M)
 
@@ -277,6 +277,7 @@ def sectionalize(text, sections=None, offset=0):
         section['index'] = len(sections)  # numbers the section
         section['start'] = section['start'] + offset  # fixes the offset
         section['end'] = section['end'] + offset
+        section['content'] = section['header'] + section['body']  # provides the full content... redundant?
         sections.append(section)
 
         if section['level'] < 6 and section['body']:
