@@ -33,61 +33,69 @@ try: import simplejson as json
 except ImportError: import json
 
 
-class Page(object):
-    repo = Repository(REPO_PATH)
+REPO = Repository(REPO_PATH)
 
-    @classmethod
-    def get(cls, key, hex=None):
-        if hex:
-            commit = cls.repo[hex]
-        else:
-            commit = cls.repo.head
+
+class Section(object):
+    def __init__(self, **kwargs): 
+        self.__dict__.update(kwargs)
+
+
+class PageManager(object):
+    def get(self, key, hex=None):
+        commit = REPO[hex] if hex else REPO.head
         te = commit.tree[key]
         blob = te.to_object()
         content = blob.data.decode("utf-8")
         return Page(name=key, content=content, revision=commit.hex)
 
-    @classmethod
-    def all(cls):
-        pages = []
-        revision = cls.repo.head.hex
-        for te in cls.repo.head.tree:                             
+    def all(self):
+        revision = REPO.head.hex
+        for te in REPO.head.tree:
             blob = te.to_object()
             if blob.type == GIT_OBJ_BLOB and not te.name.startswith("."):
                 content = blob.data.decode("utf-8")
-                pages.append(Page(name=te.name, content=content, revision=revision))
-        return pages
+                yield Page(name=te.name, content=content, revision=revision)
 
-    def delete(self,  message, user, email):
+
+class Page(object):
+    objects = PageManager()
+
+    def __getattr__(self, attr):
+        if attr == "sections":
+            return sectionalize(self.content)
+        else:
+            raise AttributeError, attr
+
+    def __init__(self, *args, **kwargs):
+        self.name = kwargs.get('name')
+        self.content = kwargs.get('content')
+        self.revision = kwargs.get('revision')
+
+    def delete(self, message, user, email):
         author = committer = Signature(user, email, time.time(), 0)
 
-        builder = Page.repo.TreeBuilder(Page.repo.head.tree)
+        builder = REPO.TreeBuilder(REPO.head.tree)
         builder.remove(self.name)
         tree_oid = builder.write()
 
         ## commits the changes
-        Page.repo.create_commit('HEAD', author, committer, message, tree_oid, [Page.repo.head.oid])
+        REPO.create_commit('HEAD', author, committer, message, tree_oid, [REPO.head.oid])
 
     def normalize(self):
         self.content = convert_line_endings(self.content, 0)  # Normalizes EOL
-        self.content = self.content.strip() + "\n\n" # Normalize whitespace around the markdown
+        self.content = self.content.strip() + "\n\n"  # Normalizes whitespace around the markdown
 
     def commit(self, message, user, email):
         author = committer = Signature(user, email, time.time(), 0)
 
-        blob_oid = Page.repo.create_blob(self.content.encode("utf-8"))
-        builder = Page.repo.TreeBuilder(Page.repo.head.tree)
+        blob_oid = REPO.create_blob(self.content.encode("utf-8"))
+        builder = REPO.TreeBuilder(REPO.head.tree)
         builder.insert(self.name, blob_oid, 0100644)
         tree_oid = builder.write()
 
         ## commits the changes
-        Page.repo.create_commit('HEAD', author, committer, message, tree_oid, [Page.repo.head.oid])
-        
-
-    def __init__(self, name=None, content=None, revision=None):
-        self.name = name
-        self.content = content
-        self.revision = revision
+        REPO.create_commit('HEAD', author, committer, message, tree_oid, [REPO.head.oid])
 
 
 class PageResource(Resource):
@@ -128,23 +136,15 @@ class PageResource(Resource):
         
         return self._build_reverse_url('aawiki:api_dispatch_detail', kwargs=kwargs)
 
-    def get_object_list(self, request):
-        # inner get of object list... this is where you'll need to
-        # fetch the data from what ever data source
-        return Page.all()
-
     def obj_get_list(self, request=None, **kwargs):
-        # outer get of object list... this calls get_object_list and
-        # could be a point at which additional filtering may be applied
-        return self.get_object_list(request)
+        return [p for p in Page.objects.all()]
 
     def obj_get(self, request=None, **kwargs):
-        # get one object from data source
         hex = request.GET.get('hex') if request else None
         name = kwargs['name']
 
         try:
-            return Page.get(name, hex=hex)
+            return Page.objects.get(name, hex=hex)
         except KeyError:
             raise NotFound("Object not found") 
     
@@ -168,43 +168,27 @@ class PageResource(Resource):
         bundle.data['name'] = kwargs['name']
 
         try:
-            bundle.obj = Page.get(bundle.data['name'])
+            bundle.obj = Page.objects.get(bundle.data['name'])
         except KeyError:
             raise NotFound("Object not found")  # will call "obj_create"
         
         return self.obj_create_or_update(bundle, request=request)
 
     def obj_delete(self, request=None, **kwargs):
-        name = kwargs['name']
+        name = kwargs.pop('name')
 
         try:
-            obj = Page.get(name)
+            page = Page.objects.get(name)
         except KeyError:
             raise NotFound("Object not found") 
 
         request.DELETE = json.loads(request.raw_post_data)
+
         message = request.DELETE.get("message") or "<no messages>"
         user = request.user.username if request.user.username else "anonymous"
         email = "%s@%s" % (user, request.META.get('REMOTE_ADDR', "localhost"))
         
-        obj.delete(message=message, user=user, email=email)
-
-
-class SectionObject(object):
-    def __init__(self, initial=None):
-        self.__dict__['_data'] = {}
-
-        if hasattr(initial, 'items'):
-            self.__dict__['_data'] = initial
-
-    def __getattr__(self, name):
-        return self._data.get(name, None)
-
-    def __setattr__(self, name, value):
-        self.__dict__['_data'][name] = value
-
-    def to_dict(self):
-        return self._data
+        page.delete(message=message, user=user, email=email)
 
 
 class SectionResource(Resource):
@@ -217,60 +201,63 @@ class SectionResource(Resource):
 
     class Meta:
         resource_name = 'section'
-        object_class = SectionObject
+        object_class = Section
         authentication = Authentication()
         authorization = Authorization()
 
     def base_urls(self):
         return [
-            url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_list'), name="api_dispatch_list"),
-            url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/schema%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('get_schema'), name="api_get_schema"),
-            url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/set/(?P<pk_list>\d[\d;]*)/$" % self._meta.resource_name, self.wrap_view('get_multiple'), name="api_get_multiple"),
-            url(r"^(?P<parent_resource_name>page)/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/(?P<pk>\d+)%s$" % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
+            url(r"^page/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)%s$" 
+                % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_list'), name="api_dispatch_list"),
+            url(r"^page/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/schema%s$" 
+                % (self._meta.resource_name, trailing_slash()), self.wrap_view('get_schema'), name="api_get_schema"),
+            url(r"^page/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/set/(?P<pk_list>\d[\d;]*)/$" 
+                % self._meta.resource_name, self.wrap_view('get_multiple'), name="api_get_multiple"),
+            url(r"^page/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/(?P<pk>\d+)%s$" 
+                % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
 
     def get_resource_uri(self, bundle_or_obj):
-        kwargs = {'resource_name': self._meta.resource_name}
+        kwargs = {
+            'resource_name': self._meta.resource_name,
+        }
 
         if isinstance(bundle_or_obj, Bundle):
-            kwargs['name'] = bundle_or_obj.obj.name
+            kwargs['pk'] = bundle_or_obj.obj.index
         else:
-            kwargs['name'] = bundle_or_obj.name
+            kwargs['pk'] = bundle_or_obj.index
         
         if self._meta.api_name is not None:
             kwargs['api_name'] = self._meta.api_name
         
         return self._build_reverse_url('aawiki:api_dispatch_detail', kwargs=kwargs)
 
-    def get_object_list(self, request, **kwargs):
+    def obj_get_list(self, request=None, **kwargs):
         hex = request.GET.get('hex') if request else None
-        name = kwargs['parent_name']
+        name = kwargs.pop('parent_name')
 
         try:
-            page = Page.get(name, hex=hex)
+            page = Page.objects.get(name, hex=hex)
         except KeyError:
             raise NotFound("Object not found") 
 
-        return [SectionObject(i) for i in sectionalize(page.content)]
+        return [Section(**i) for i in sectionalize(page.content)]
 
-    def obj_get_list(self, request=None, **kwargs):
-        return self.get_object_list(request, **kwargs)
-    
     def obj_get(self, request=None, **kwargs):
         hex = request.GET.get('hex') if request else None
         name = kwargs['parent_name']
 
         try:
-            page = Page.get(name, hex=hex)
+            page = Page.objects.get(name, hex=hex)
         except KeyError:
             raise NotFound("Object not found") 
 
         try:
-            section = sectionalize(page.content)[int(kwargs['pk'])]
+            section = page.sections[int(kwargs['pk'])]
         except IndexError:
             raise NotFound("Object not found") 
 
-        return SectionObject(section)
+        return Section(**section)
 
     def obj_create(self, bundle, request=None, **kwargs):
         raise NotImplementedError()
@@ -281,7 +268,7 @@ class SectionResource(Resource):
         bundle = self.full_hydrate(bundle)
 
         try:
-            page = Page.get(name)
+            page = Page.objects.get(name)
         except KeyError:
             raise NotFound("Object not found") 
 
@@ -290,14 +277,10 @@ class SectionResource(Resource):
         except IndexError:
             raise NotFound("Object not found") 
 
-
-
-
-        #page = PageResource()
-        #bundle = page.build_bundle(request=request, data=form.data.dict())
-
-        #try:
-            #page.obj_update(bundle, request=request, name=slug)
-        #except NotFound:
+        message = bundle.data.get("message") or "<edited page %s>" % name
+        user = request.user.username if request.user.username else "anonymous"
+        email = "%s@%s" % (user, request.META.get('REMOTE_ADDR', "localhost"))
+        
+        page.commit(message=message, user=user, email=email)
 
         return bundle
