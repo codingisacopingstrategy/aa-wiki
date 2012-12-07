@@ -1,126 +1,98 @@
 {% extends "aawiki/base.html" %}
 
-{% load aacoretags aawikitags typogrify_tags %}
 
-{% block title %}{{ block.super }} | {{ slug }}{% endblock %}
+{% load aawikitags %}
 
-{% block extrahead %}
-<script src="{{ STATIC_URL }}lib/jquery.slideToggleMinHeight.min.js"></script>
-<script src="{{ STATIC_URL }}lib/shortcut.js"></script>   
 
-<script src="{{ STATIC_URL }}aawiki/js/jquery.sortByZIndex.js"></script>   
-<script src="{{ STATIC_URL }}aawiki/js/jquery.caret.js"></script>   
-<script src="{{ STATIC_URL }}aawiki/js/jquery.aalayers.js"></script>   
-
-<script src="{{ STATIC_URL }}aawiki/js/jquery.datetimecode.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.timeline.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.voidplayer_simple.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/jquery.aamediasync.js"></script>
-
-<script src="{{ STATIC_URL }}aawiki/js/jquery.ui.autoscrollable.js"></script>
-
-<script src="{{ STATIC_URL }}aawiki/js/jquery.ffind.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/aa.sidebar.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/aa.view.js"></script>
-<script src="{{ STATIC_URL }}aawiki/js/aa.browser.js"></script>
-<script src="{{ STATIC_URL }}lib/iscroll/src/iscroll.js"></script>
-<script src="{{ STATIC_URL }}lib/jquery.getCSS.min.js"></script>
-
-<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.styles.play.css" media="screen"/>
-
-{% get_markdown_for content as md meta %}
-{% for css in meta.extra_css %}<link rel="stylesheet" href="{{ css }}" media="screen"/>{% endfor %}
-
-{% comment %}
-{% if hex %}
-<link rel="stylesheet" href="{{ STATIC_URL }}lib/toastr/toastr.css" type="text/css"/>
-<script src="{{ STATIC_URL }}lib/toastr/toastr.js"></script>
-<script>
-$(function() {
-    toastr.warning('<del>Text stroked hover</del> has been deleted, <ins>text in red</ins> has been added.');
-});
-{% endif %}
-</script>
-{% endcomment %}
-
+{% block css %}
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css" media="screen"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css" media="screen"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.swatch.css" media="screen"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/Font-Awesome-More/css/font-awesome.css" media="screen"/>
 {% endblock %}
 
 
 {% block body %}
-<nav id="timeline" class="ui-layout-north">
-    <nav id="controls">
-        <span id="playpause">play</span>
-        <span id="time">00:00:00 / 00:12:35</span>
-        <form id="mode">
-            {% spaceless %}            
-                {% for mode in meta.mode %}
-                    <input type="radio" id="mode{{ mode|lower|slugify }}" name="mode" value="{{ mode|lower|slugify }}" />            
-                    <label for="mode{{ mode|lower|slugify }}">{{ mode|lower }}</label>
-                {% endfor %}
-            {% endspaceless %}
-        </form>
-    </nav>
-    <div id="timelineslider"></div>
-</nav>
+{% get_markdown_for content as md meta %}
+<a href="#t=300,600">00:05:00 --> 00:06:00</a>
+<a href="#t=600,">00:06:00 --></a>
 
-<iframe id="browser-panel" class="ui-layout-south" src="{% url aacore.views.browse %}"></iframe>
+<span class="swatch" title="Drag over a section to apply the style">
+    <label for="font-size"><i class="icon-beaker"></i> font-size</label> 
+    <select id="font-size">
+      <option value="">reset</option>
+      <option value="xx-small">xx-small</option>
+      <option value="x-small">x-small</option>
+      <option value="small">small</option>
+      <option value="medium">medium</option>
+      <option value="large">large</option>
+      <option value="x-large">x-large</option>
+      <option value="xx-large">xx-large</option>
+      <option value="smaller">smaller</option>
+      <option value="larger">larger</option>
+    </select>
+</span>
 
-<article id="canvas" class="ui-layout-center
-                            {% if meta.mode %}{{ meta.mode|first }}{% endif %}
-                            {% if meta.type %}{{ meta.type|first }}{% endif %}">
+<div id="toc">
+    <form>
+        <input name="foo" value="your_value" id="foo" type="checkbox">
+        <label for="foo"><i class="icon-eye-open"></i> name</label>
+    </form>
+    <style type="text/css" media="screen">
+        input[type="checkbox"] { display: none }
+        input[type="checkbox"] + label:before { content: "☆ " }
+        input[type="checkbox"]:checked + label:before { content: "★ " }
+    </style>
 
-    <div id="wrapper">{{ md|render_aatags|safe|smartypants }}</div>
+</div>
 
-    <nav id="zoom">
-    <button id="zoomin">+</button>
-    <div id="zoomslider"></div>
-    <button id="zoomout">-</button>
-    </nav>
-</article>
+
+<div id="timelineslider"></div>
+
+
+<form id="mode">
+    <input type="radio" id="modecanvas" name="mode" value="canvas">
+    <label for="modecanvas">canvas</label>
+    <input type="radio" id="modecinematic" name="mode" value="cinematic">
+    <label for="modecinematic">cinematic</label>
+</form>
+{{ md|render_aatags|safe }}
 {% endblock %}
 
 
-{% block toolbar %}
-{% if user.is_authenticated %}
-<ul id="toolbar">
-    {% if rev %}
-    <li><a id="view" title="View the page" href="{% url aawiki:page-detail slug %}">View</a></li>
-    {% endif %}
-    <li><a id="edit" title="Edit the full page" href="{% url aawiki:page-edit slug %}">Edit</a></li>
-    <li><a id="history" title="Browse this page history" href="{% url aawiki:page-history slug %}">History</a></li>
-    <li><a id="add" title="Add an annotation" href="#">Add</a></li>
-    <li><a id="save" title="Make a snapshot of the page as it is now" href="#">Save</a></li>
-</ul>
-{% endif %}
-{% endblock %}
+{% block js %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 
-{% block hgroup %}
-<hgroup>
-{% if meta.title %}
-    <h1 property="dc:title">{{ meta.title|first }}</h1>
-{% else %}
-    <h1 property="dc:title">{{ slug }}</h1>
-{% endif %}
+<script src="{{ STATIC_URL }}aawiki/js/jquery.ffind.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.wrapContent.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aa.annotation.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aa.swatch.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aa.classSwitcher.js"></script>
 
-{% if meta.subtitle %}
-    <h2>{{ meta.subtitle|first }}</h2>
-{% endif %}
-</hgroup>
-{% endblock %}
-
-
-{% block tabs %}
-{% include "aawiki/partials/tab-about.html" %}
-{% include "aawiki/partials/tab-layers.html" %}
-{% include "aawiki/partials/tab-swatches.html" %}
-{% include "aawiki/partials/tab-help.html" %}
-{% include "aawiki/partials/tab-upload.html" %}
-{% endblock %}
-
-
-{% block extrasidebar %}
-{% if rev %}
-<br />
-<p class="warning">This is an old revision of this page, as edited by {{ commit.author }} at {{ commit.committed_date|epock2datetime }}. It may differ significantly from the <a href="{{ page.get_absolute_url }}">current revision</a>.</p>
-{% endif %}
+<script src="{{ STATIC_URL }}aawiki/js/jquery.ui.autoscrollable.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/timecode.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.voidplayer_simple.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.aamediasync.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.timeline.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.closestAttr.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/jquery.datetimecode.js"></script>
+<script src="{{ STATIC_URL }}lib/jquery.ba-bbq.min.js"></script>
+<script src="{{ STATIC_URL }}aawiki/js/timething.tmp.js"></script>
+<script>
+$(function() {
+    $(".section1").annotation();
+    $(".swatch").swatch();
+    $("#mode").classSwitcher({
+        selector: "body",
+        end: function () {
+            console.log($("body").attr("class"));
+        }
+    });
+    $(window).bind( 'hashchange', function(e) { 
+        console.log("ok");
+    
+    });
+});
+</script>
 {% endblock %}

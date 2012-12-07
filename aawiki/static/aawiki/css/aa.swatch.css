@@ -1,0 +1,33 @@
+/* swatches {{{ */
+span.swatch { 
+    display: block; 
+    float: left; 
+    margin-right: 8px; 
+    margin-bottom: 8px; 
+    border: 1px solid lightgray; 
+    padding: 2px 4px; 
+    background-color: white; 
+    cursor: move;
+}
+span.swatch label {
+    cursor: inherit;
+    top: 0;
+}
+span.swatch label,
+span.swatch select {
+    display: inline;
+    font-size: smaller;
+}
+/* }}} */
+
+.drophover {
+    background: yellow;
+    border: 1px solid black !important;
+    -moz-box-shadow: 0px 0px 4px yellow;
+    -webkit-box-shadow: 0px 0px 4px yellow;
+    box-shadow: 0px 0px 4px yellow;
+    /* For IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='yellow')";
+    /* For IE 5.5 - 7 */
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='yellow');
+}

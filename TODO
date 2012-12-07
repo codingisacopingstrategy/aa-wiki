@@ -119,3 +119,7 @@ Meeting Skyope long-court 27/04/2012
 ====================================
 
 - Scroll personalisé
+
+$(window).bind('hashchange', function() {
+  .. work ..
+});

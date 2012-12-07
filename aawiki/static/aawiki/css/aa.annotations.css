@@ -1,0 +1,163 @@
+/* annotations {{{ */
+section.section1 {
+    background-color: white;
+    border: 1px solid #ddd;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 400px;
+    overflow: hidden;
+    padding-bottom: 23px; /* equals the size of h1 */
+    cursor: auto;
+}
+
+section.section1 > div.wrapper {
+    overflow-x: hidden;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    padding: 5px;
+}
+
+section.section1 h1 {
+    font-family: 'News Cycle';
+    letter-spacing: 1px;
+    font-size: 13px;
+    line-height: 13px;
+    margin: 0;
+    top: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 5px;
+    cursor: move;
+}
+section.section1 h1:hover {
+    background-color: whitesmoke;
+}
+section.section1 span.about {
+    display: none;
+}
+section.section1[about] span.about {
+    display: inline;
+}
+
+section.section1 h2 {
+    font-size: 13px;
+    line-height: 18px;
+    /*font-weight: bold;*/
+    /*font-family: 'News Cycle'; */
+    /*letter-spacing: 1px;*/
+}
+
+section.section1 h2, 
+section.section1 p {
+    margin-bottom: 18px;
+}
+section.section1 h2:last-child, 
+section.section1 p:last-child {
+    margin-bottom: 0;
+}
+/* SECTION 2 ---------- */
+section.section2 {
+    border-top: 1px solid darkgray;
+    margin-top: -1px;
+    padding-bottom: 18px;
+}
+/* }}} */
+
+
+/* section editing {{{*/
+section.editing div.wrapper { 
+    display: none; 
+}
+section.editing textarea {
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    border: 1px solid black;
+    outline: 0px none transparent;
+    padding: 5px;
+    resize: none;
+    font-size: 11px;
+    line-height: 15px;
+}
+/* }}} */
+
+
+/* BUTTONS --------- {{{ */
+section span.edit,
+section span.save,
+section span.cancel {
+    display: none;
+    cursor: pointer;
+    color: gray;
+    float: right;
+    position: relative;
+    font-size: 13px;
+}
+section:hover span.edit {
+    display: block;
+}
+body.locked section:hover span.edit {
+    display: none;  /* hides the section edit link if user isn't logged in */
+}
+section span.edit:hover,
+section span.save:hover,
+section span.cancel:hover {
+    color: blue;
+}
+section.editing span.edit {
+    display: none;
+}
+section.editing span.save,
+section.editing span.cancel {
+    display: block;
+}
+/* }}} */
+
+
+/* collapsing {{{ */
+section.collapsed {
+    height: auto !important;
+    padding-bottom: 0;
+}
+section.section2.collapsed {
+    border: none;
+    border-top: 1px solid darkgray;
+}
+section.collapsed > div.wrapper {
+    display: none;
+}
+section.section1 h2 {
+    cursor: n-resize;
+}
+section.collapsed h2 {
+    color: lightgray;
+    cursor: s-resize;
+}
+section.collapsed h1:before,
+section.collapsed h2:before {
+    content: "\25B8";
+    margin-right: 0.25em;
+}
+section.collapsed span.edit {
+    display: none;
+}
+/* }}} */
+
+.grid {
+  background-size: 20px 20px, 20px 20px;
+  background-position: 0 0,0 0;
+  background-image: -webkit-linear-gradient(top, transparent, transparent 19px, cyan 20px), -webkit-linear-gradient(left, transparent, transparent 19px, cyan 20px); 
+}
+
+.active {
+    background-color: yellow;
+}

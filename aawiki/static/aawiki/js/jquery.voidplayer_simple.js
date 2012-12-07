@@ -102,33 +102,33 @@
 
 
 
-// jQuery.media timecode funcs
+//// jQuery.media timecode funcs
 /**
  * function String.toSeconds ()
  *
  * Convert any number to seconds
  */
-String.prototype.toSeconds = function () {
-	var time = this;
+//String.prototype.toSeconds = function () {
+	//var time = this;
 
-	if (/^([0-9]{1,2}:)?[0-9]{1,2}:[0-9]{1,2}(\.[0-9]+)?(,[0-9]+)?$/.test(time)) {
-		time = time.split(':', 3);
+	//if (/^([0-9]{1,2}:)?[0-9]{1,2}:[0-9]{1,2}(\.[0-9]+)?(,[0-9]+)?$/.test(time)) {
+		//time = time.split(':', 3);
 
-		if (time.length == 3) {
-			var ms = time[2].split(',', 2);
-			ms[1] = ms[1] ? ms[1] : 0;
+		//if (time.length == 3) {
+			//var ms = time[2].split(',', 2);
+			//ms[1] = ms[1] ? ms[1] : 0;
 
-			return ((((parseInt(time[0], 10) * 3600) + (parseInt(time[1], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
-		}
+			//return ((((parseInt(time[0], 10) * 3600) + (parseInt(time[1], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
+		//}
 
-		var ms = time[1].split(',', 1);
-		ms[1] = ms[1] ? ms[1] : 0;
+		//var ms = time[1].split(',', 1);
+		//ms[1] = ms[1] ? ms[1] : 0;
 
-		return ((((parseInt(time[0], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
-	}
+		//return ((((parseInt(time[0], 10) * 60) + parseFloat(ms[0])) * 1000) + parseInt(ms[1], 10)) / 1000;
+	//}
 
-	return parseFloat(time).toSeconds();
-}
+	//return parseFloat(time).toSeconds();
+//}
 
 
 /**
@@ -136,9 +136,9 @@ String.prototype.toSeconds = function () {
  *
  * Convert a seconds time value to any other time format
  */
-String.prototype.secondsTo = function (outputFormat) {
-	return this.toSeconds().secondsTo(outputFormat);
-}
+//String.prototype.secondsTo = function (outputFormat) {
+	//return this.toSeconds().secondsTo(outputFormat);
+//}
 
 
 /**
@@ -146,9 +146,9 @@ String.prototype.secondsTo = function (outputFormat) {
  *
  * Convert any number to seconds
  */
-Number.prototype.toSeconds = function () {
-	return Math.round(this * 1000) / 1000;
-}
+//Number.prototype.toSeconds = function () {
+	//return Math.round(this * 1000) / 1000;
+//}
 
 
 /**
@@ -156,40 +156,40 @@ Number.prototype.toSeconds = function () {
  *
  * Convert a seconds time value to any other time format
  */
-Number.prototype.secondsTo = function (outputFormat) {
-	var time = this;
+//Number.prototype.secondsTo = function (outputFormat) {
+	//var time = this;
 
-	switch (outputFormat) {
-		case 'ms':
-			return Math.round(time * 1000);
+	//switch (outputFormat) {
+		//case 'ms':
+			//return Math.round(time * 1000);
 
-		case 'mm:ss':
-		case 'hh:mm:ss':
-		case 'hh:mm:ss.ms':
-			var hh = '';
+		//case 'mm:ss':
+		//case 'hh:mm:ss':
+		//case 'hh:mm:ss.ms':
+			//var hh = '';
 
-			if (outputFormat != 'mm:ss') {
-				hh = Math.floor(time / 3600);
-				time = time - (hh * 3600);
-                hh = (hh < 10) ? ("0" + hh) : hh; // forces two digits hours
-				hh += ':';
-			}
+			//if (outputFormat != 'mm:ss') {
+				//hh = Math.floor(time / 3600);
+				//time = time - (hh * 3600);
+                //hh = (hh < 10) ? ("0" + hh) : hh; // forces two digits hours
+				//hh += ':';
+			//}
 
-			var mm = Math.floor(time / 60);
-			time = time - (mm * 60);
-			mm = (mm < 10) ? ("0" + mm) : mm;
-			mm += ':';
+			//var mm = Math.floor(time / 60);
+			//time = time - (mm * 60);
+			//mm = (mm < 10) ? ("0" + mm) : mm;
+			//mm += ':';
 
-			var ss = time;
+			//var ss = time;
 
-			if (outputFormat == 'hh:mm:ss' || outputFormat == 'mm:ss') { // MLM: added mm:ss
-				ss = Math.round(ss);
-			}
-			ss = (ss < 10) ? ("0" + ss) : ss;
+			//if (outputFormat == 'hh:mm:ss' || outputFormat == 'mm:ss') { // MLM: added mm:ss
+				//ss = Math.round(ss);
+			//}
+			//ss = (ss < 10) ? ("0" + ss) : ss;
 
-			return hh + mm + ss;
-	}
+			//return hh + mm + ss;
+	//}
 
-	return time;
-};
+	//return time;
+//};
 

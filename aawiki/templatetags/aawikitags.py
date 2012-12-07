@@ -6,6 +6,7 @@ from django import template
 from aawiki import utils
 from aawiki.mdx import get_markdown
 from aawiki import tags
+from django.utils.safestring import mark_safe
 
 
 register = template.Library()
@@ -60,7 +61,7 @@ class MarkdownConvertor(template.Node):
         # We use context.dicts[0] instead of context in order to access the
         # variables in any template blocks
         # See http://od-eon.com/blogs/liviu/scope-variables-template-blocks/
-        context.dicts[0][self.var_name] = html
+        context.dicts[0][self.var_name] = mark_safe(html)
         if hasattr(md, "Meta"):
             context.dicts[0][self.meta_name] = md.Meta
         else:
