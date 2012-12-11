@@ -89,8 +89,7 @@ def embed (request):
     # ALLOW (authorized users) to trigger a resource to be added...
     if url.startswith("http://"):
         # TODO: REQUIRE LOGIN TO ACTUALLY ADD...
-        #add_resource(url, RDF_MODEL, request)
-        pass
+        AAResource(url).index()
 
     ### APPLY FILTERS (if any)
     pipeline = request.REQUEST.get("filter", "embed").strip()
@@ -103,6 +102,8 @@ def embed (request):
         'original_url': url,
         #'local_url': Resource.objects.get(url=url).get_local_url(),
         #'local_path': Resource.objects.get(url=url).get_local_file(),
+        'local_url': "",
+        'local_path': "",
         'output': 'None',
         'extra_css': [],
         'extra_js': [],
