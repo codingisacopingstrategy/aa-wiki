@@ -4,11 +4,24 @@
 {% load aawikitags %}
 
 
+{% block extrahead %}
+{#<link rel="alternate" type="application/json" href="{% url 'api_dispatch_list' resource_name='page' api_name='v1' %}"/>#}
+<link rel="alternate" type="application/json" href="/api/v1/page/{{ slug }}"/>
+<link rel="aa-embed" type="text/html" href="/embed/"/>
+{% endblock %}
+
+
 {% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/css/reset.css" media="screen"/>
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css" media="screen"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css" media="screen"/>
+<link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.rdfa.css" media="screen"/>
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.annotations.css" media="screen"/>
 <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.swatch.css" media="screen"/>
 <link rel="stylesheet" href="{{ STATIC_URL }}lib/Font-Awesome-More/css/font-awesome.css" media="screen"/>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/custom-scrollbar-plugin/jquery.mCustomScrollbar.css" media="screen"/>
 {% endblock %}
 
 
@@ -64,6 +77,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
 
+<script src="{{ STATIC_URL }}aawiki/js/aa.embeds.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/jquery.ffind.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/jquery.wrapContent.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/jquery.aa.annotation.js"></script>
@@ -79,6 +93,11 @@
 <script src="{{ STATIC_URL }}aawiki/js/jquery.datetimecode.js"></script>
 <script src="{{ STATIC_URL }}lib/jquery.ba-bbq.min.js"></script>
 <script src="{{ STATIC_URL }}aawiki/js/timething.tmp.js"></script>
+
+<!--<script src="{{ STATIC_URL }}aawiki/js/jquery.contextual-menu.js"></script>-->
+
+<script src="{{ STATIC_URL }}lib/custom-scrollbar-plugin/jquery.mousewheel.min.js"></script>
+<script src="{{ STATIC_URL }}lib/custom-scrollbar-plugin/jquery.mCustomScrollbar.js"></script>
 <script>
 $(function() {
     $(".section1").annotation();
@@ -89,10 +108,7 @@ $(function() {
             console.log($("body").attr("class"));
         }
     });
-    $(window).bind( 'hashchange', function(e) { 
-        console.log("ok");
-    
-    });
+    //$(".section1").mCustomScrollbar();
 });
 </script>
 {% endblock %}

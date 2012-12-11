@@ -1,7 +1,7 @@
 /* annotations {{{ */
 section.section1 {
     background-color: white;
-    border: 1px solid #ddd;
+    border: 1px solid whitesmoke;
     position: absolute !important;
     top: 0;
     left: 0;
@@ -48,7 +48,8 @@ section.section1[about] span.about {
 
 section.section1 h2 {
     font-size: 13px;
-    line-height: 18px;
+    line-height: 16px;
+    text-align: right;
     /*font-weight: bold;*/
     /*font-family: 'News Cycle'; */
     /*letter-spacing: 1px;*/
@@ -56,7 +57,7 @@ section.section1 h2 {
 
 section.section1 h2, 
 section.section1 p {
-    margin-bottom: 18px;
+    margin-bottom: 16px;
 }
 section.section1 h2:last-child, 
 section.section1 p:last-child {
@@ -64,9 +65,9 @@ section.section1 p:last-child {
 }
 /* SECTION 2 ---------- */
 section.section2 {
-    border-top: 1px solid darkgray;
+    border-top: 1px solid whitesmoke;
     margin-top: -1px;
-    padding-bottom: 18px;
+    padding-bottom: 16px;
 }
 /* }}} */
 
@@ -78,7 +79,7 @@ section.editing div.wrapper {
 section.editing textarea {
     width: 100%;
     box-sizing: border-box;
-    -webkit-box-sizing:border-box;
+    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     border: 1px solid black;
@@ -86,7 +87,7 @@ section.editing textarea {
     padding: 5px;
     resize: none;
     font-size: 11px;
-    line-height: 15px;
+    line-height: 16px;
 }
 /* }}} */
 
@@ -159,5 +160,31 @@ section.collapsed span.edit {
 }
 
 .active {
-    background-color: yellow;
+    background-color: paleGreen;
 }
+
+
+/* timecodes {{{ */
+span[property="aa:start"],
+span[property="aa:end"] {
+    color: gray;
+    font-size: smaller;
+}
+span[property="aa:start"]:hover,
+span[property="aa:end"]:hover {
+    cursor: pointer;
+    color: blue;
+}
+span[property="aa:start"]:after {
+    content: "\00A0\2192\00A0";
+}
+span[property="aa:start"]:last-child:after {
+    content: "\00A0\2192\00A0 ?";
+}
+span[property="aa:end"].deduced:after {
+    content: ")";
+}
+span[property="aa:end"].deduced:before {
+    content: "(";
+}
+/* }}} */

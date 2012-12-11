@@ -23,8 +23,10 @@ $(function() {
     /* REFRESH */
     // The refresh event gets fired on #canvas initially
     // then on any <section> or other dynamically loaded/created element to "activate" it
-    $canvas.bind("refresh", function (evt) {
-        $(context).add('#sidebar').find("[rel='aa:embed']").each(function () {
+    var embedUrl = $('link[rel="aa-embed"]').attr("href");
+
+    //$("body").bind("refresh", function (evt) {
+        $("[rel='aa:embed']").each(function () {
             var that = this;
             function poll () {
                 $.ajax(embedUrl, {
@@ -86,7 +88,7 @@ $(function() {
         });
 
         // Embed Links show/hide on rollover 
-        $(context).ffind("div.aa_embed").each(function () {
+        $("body").ffind("div.aa_embed").each(function () {
             $(this).mouseover(function () {
                 $(".links", this).show();
             }).mouseout(function () {
@@ -96,7 +98,7 @@ $(function() {
 
         // DIRECTLINKs
         // Make directlinks draggable
-        $("a.directlink", context).each(function () {
+        $("a.directlink").each(function () {
             $(this).draggable({
                 helper: function () {
                     return $(this).clone().appendTo("body");
@@ -105,7 +107,7 @@ $(function() {
         });
 
         // h1's are droppable to set about
-        $(context).ffind(".section1").find("h1").droppable({
+        $("body").ffind(".section1").find("h1").droppable({
             accept: ".directlink",
             hoverClass: "drophover",
             drop: function (evt, ui) {
@@ -116,7 +118,7 @@ $(function() {
                 resetTimelines();
             }
         });
-    })
+    //})
 });
 
 /* vim: set foldmethod=indent: */

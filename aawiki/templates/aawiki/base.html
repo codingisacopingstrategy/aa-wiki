@@ -9,7 +9,12 @@
 <head>
     <meta charset="utf-8"/>
     <title>{% block title %}active archives{% endblock %}</title>
-    {% block css %}{% endblock %}
+
+    {% block extrahead %}{% endblock %}
+
+    {% block css %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}aawiki/css/aa.wiki.css" media="screen"/>
+    {% endblock %}
 </head>
 
 <body>

@@ -21,8 +21,6 @@
 (function( $ ){
     var methods = {
         init : function (options) { 
-            console.log(options);
-
             var settings = $.extend( {
                 target : 'body',
                 end : function () {}

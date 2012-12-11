@@ -1,8 +1,31 @@
-//depends on jquery.ffind.js
-//depends on jquery.wrapContent.js
+/**
+ * This file is part of Active Archives.
+ * Copyright 2006-2012 the Active Archives contributors (see AUTHORS)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Also add information on how to contact you by electronic and paper mail.
+ */
+
+
+// depends on jquery.ffind.js
+// depends on jquery.wrapContent.js
 
 
 (function( $ ){
+    var api = $('link[rel="alternate"][type="application/json"]').attr("href");
+
+
     var createAboutButton = function () {
         //return $("<span>").text("@").addClass('about').attr('title', 'Highlight the object this annotation is about');
         return $("<span>").addClass('icon-link').attr('title', 'Highlight the object this annotation is about');
@@ -18,13 +41,13 @@
     }
 
     var createSaveButton = function () {
-        return $("<span>").text("✔").addClass('save').attr('title', 'Save changes').on("click", function () {
+        return $("<span>").addClass("icon-ok").addClass('save').attr('title', 'Save changes').on("click", function () {
             $(this).closest("section").trigger("save");
         });
     }
 
     var createCancelButton = function () {
-        return $("<span>").text("✘").addClass('cancel').attr('title', 'Cancel changes').on("click", function () {
+        return $("<span>").addClass("icon-remove").addClass('cancel').attr('title', 'Cancel changes').on("click", function () {
             $(this).closest("section").trigger("cancel");
         });
     }
@@ -46,33 +69,22 @@
     var renumberSections = function () {
         $('section').not('[data-section="-1"]').each(function (i) {
             $(this).attr("data-section", (i + 1));
-            console.log($(this).data('section'));
         });
     };
 
-    var onSectionCancelTriggered = function (event) {
-        event.stopPropagation()
-
+    var quitEditMode = function () {
         $(this).find(":header").first().find(".save").remove();
         $(this).find(":header").first().find(".cancel").remove();
         $(this).find(".section_edit").first().remove();
 
         $(this).removeClass("editing");
-
-        console.log($(this).get(), "was cancelled");
-    }
-
-    var onSectionSaveTriggered = function (event) {
-        event.stopPropagation()
-
-        console.log($(this).get(), "was saved");
-    }
+    };
 
     var onSectionEditTriggered = function (event) {
         event.stopPropagation()
 
         var height = $(this).first(".wrapper").height();
-        var textarea = $("<textarea>").height(height);
+        var textarea = $("<textarea>").height(height - 4);
         $(this).append($('<div class="section_edit">').append(textarea));
 
         $(this).find(":header").first().append(createCancelButton());
@@ -80,28 +92,64 @@
 
         $(this).addClass("editing");
 
-        $.ajax("/api/v1/page/BlaBlaBla/section/" + $(this).data("section"), {
+        $.ajax(api + "/section/" + $(this).data("section"), {
             dataType: 'json',
             beforeSend: function () {
                 textarea.attr("disabled", "disabled").val("loading...")
-                console.log("before send");
-            },
-            complete: function () {
-                console.log("completed");
             },
             success: function (data) {
                 textarea.val(data.content).removeAttr("disabled");
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert("An error occured: " + xhr.status + " " + thrownError);
+            },
+            complete: function () {
             }
         });
+    }
+
+    var onSectionCancelTriggered = function (event) {
+        event.stopPropagation()
+
+        quitEditMode.apply(this);
+
+    }
+
+    var onSectionSaveTriggered = function (event) {
+        event.stopPropagation()
+
+        var that = this;
+        var textarea = $(this).find(".section_edit").find("textarea");
+        var content = textarea.val();
+
+        $.ajax(api + "/section/" + $(this).data("section") + '/', {
+            type: 'PUT',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({content: content}),
+            beforeSend: function () {
+                textarea.attr("disabled", "disabled");
+            },
+            success: function (data) {
+                var newSection = $(data.html);
+                quitEditMode.apply(that);
+                foo.apply(newSection);
+                $(that).replaceWith(newSection);
+                renumberSections();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert("An error occured: " + xhr.status + " " + thrownError);
+                textarea.removeAttr("disabled");
+            },
+            complete: function () {
+            }
+        });
+
     }
 
     var onSectionGeometryChangeTriggered = function (event) {
         event.stopPropagation()
 
-        console.log(this, "changed geometry");
     }
 
     var onHeaderDblClickTriggered = function (event) {
@@ -115,6 +163,65 @@
         }
     }
 
+    var bar = function () {
+        console.log(this);
+        $(this).ffind("section").wrapContent();
+
+        $(this).find(":header")
+        .append(createEditButton);
+
+        $(this).find("h1").attr('title', 'Drag to move. Double-click to open/close.')
+        .prepend(createAboutButton);
+        $(this).find("h2").attr('title', 'Double-click to open/close.');
+    };
+
+    var foo = function () {
+        console.log(this);
+        bar.apply(this);
+
+        $(this).on("geometrychange", onSectionGeometryChangeTriggered);
+        $(this).ffind("section").on("edit", onSectionEditTriggered)
+                                .on("save", onSectionSaveTriggered)
+                                .on("cancel", onSectionCancelTriggered);
+        $(this).find(":header").on("dblclick", onHeaderDblClickTriggered);
+
+        $(this).on('mousedown', function (event) {
+            event.stopPropagation(); 
+        }).draggable({
+            cancel: 'span.edit',
+            scroll: true,
+            handle: 'h1',
+            distance: 20,
+            drag: function (event, ui) {
+                if (event.ctrlKey) {
+                    $("html").addClass("grid");
+                    ui.position.left = Math.floor(ui.position.left / 20) * 20;
+                    ui.position.top = Math.floor(ui.position.top / 20) * 20;
+                } else {
+                    $("html").removeClass("grid");
+                }
+            },
+            stop: function () { 
+                constraintAnnotation(this);
+                $("html").removeClass("grid");
+                $(this).trigger('geometrychange');
+            }
+        }).resizable({
+            resize: function (event, ui) {
+                if (event.ctrlKey) {
+                    ui.size.width = Math.floor(ui.size.width / 20) * 20;
+                    ui.size.height = Math.floor(ui.size.height / 20) * 20;
+                    $("html").addClass("grid");
+                } else {
+                    $("html").removeClass("grid");
+                }
+            },
+            stop: function () { 
+                $(this).trigger('geometrychange');
+             }
+        });
+    }
+
     var methods = {
         init : function (options) { 
             var settings = $.extend({
@@ -123,61 +230,7 @@
             renumberSections();
 
             return this.each(function (i) {
-                $(this).ffind("section").wrapContent();
-
-                $(this).find(":header")
-                .prepend(createAboutButton)
-                .append(createEditButton);
-
-                $(this).find("h1").attr('title', 'Drag to move. Double-click to open/close.');
-                $(this).find("h2").attr('title', 'Double-click to open/close.');
-
-                $(this).on("geometrychange", onSectionGeometryChangeTriggered);
-                $(this).ffind("section").on("edit", onSectionEditTriggered)
-                                        .on("save", onSectionSaveTriggered)
-                                        .on("cancel", onSectionCancelTriggered);
-                $(this).find(":header").on("dblclick", onHeaderDblClickTriggered);
-
-                $(this).on('mousedown', function (event) {
-                    event.stopPropagation(); 
-                }).draggable({
-                    //snap: ".anchor",
-                    //snapMode: "inner",
-                    cancel: 'span.edit',
-                    scroll: true,
-                    handle: 'h1',
-                    distance: 20,
-                    //delay: 200,  // NOTE: Prevents unwanted saves 
-                    //containment: "parent",
-                    //scroll: true,
-                    drag: function (event, ui) {
-                        if (event.ctrlKey) {
-                            $("html").addClass("grid");
-                            ui.position.left = Math.floor(ui.position.left / 20) * 20;
-                            ui.position.top = Math.floor(ui.position.top / 20) * 20;
-                        } else {
-                            $("html").removeClass("grid");
-                        }
-                    },
-                    stop: function () { 
-                        constraintAnnotation(this);
-                        $("html").removeClass("grid");
-                        $(this).trigger('geometrychange');
-                    }
-                }).resizable({
-                    resize: function (event, ui) {
-                        if (event.ctrlKey) {
-                            ui.size.width = Math.floor(ui.size.width / 20) * 20;
-                            ui.size.height = Math.floor(ui.size.height / 20) * 20;
-                            $("html").addClass("grid");
-                        } else {
-                            $("html").removeClass("grid");
-                        }
-                    },
-                    stop: function () { 
-                        $(this).trigger('geometrychange');
-                     }
-                });
+                foo.apply(this);
             })
         },
         destroy: function () { 
