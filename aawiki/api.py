@@ -24,6 +24,7 @@ from tastypie.utils import trailing_slash
 
 import time
 
+from aawiki.mdx import get_markdown
 from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace)
 from aawiki.utils import convert_line_endings
 from aawiki.settings import REPO_PATH
@@ -34,6 +35,15 @@ except ImportError: import json
 
 
 REPO = Repository(REPO_PATH)
+
+
+def add_html_key (x):
+    if x["index"] == 0:
+        md = get_markdown()
+    else:
+        md = get_markdown(simple=True)
+    x['html'] = md.convert(x['content'])
+    return x
 
 
 class Section(object):
@@ -193,17 +203,19 @@ class PageResource(Resource):
 
 class SectionResource(Resource):
     content = fields.CharField(attribute='content')
-    header = fields.CharField(attribute='header', readonly=True)
-    body = fields.CharField(attribute='body', readonly=True)
+    header = fields.CharField(attribute='header', readonly=True, null=True)
+    body = fields.CharField(attribute='body', readonly=True, null=True)
     index = fields.IntegerField(attribute='index', readonly=True)
-    start = fields.IntegerField(attribute='start', readonly=True)
-    end = fields.IntegerField(attribute='end', readonly=True)
+    start = fields.IntegerField(attribute='start', readonly=True, null=True)
+    end = fields.IntegerField(attribute='end', readonly=True, null=True)
+    html = fields.CharField(attribute='html', readonly=True, null=True)
 
     class Meta:
         resource_name = 'section'
         object_class = Section
         authentication = Authentication()
         authorization = Authorization()
+        always_return_data = True
 
     def base_urls(self):
         return [
@@ -216,6 +228,12 @@ class SectionResource(Resource):
             url(r"^page/(?P<parent_name>\w[\w/\.-]*)/(?P<resource_name>%s)/(?P<pk>\d+)%s$" 
                 % (self._meta.resource_name, trailing_slash()), self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
+
+    def hydrate(self, bundle):
+        md = get_markdown(simple=True)
+        #import ipdb; ipdb.set_trace()
+        bundle.data['html'] = md.convert(bundle.data['content'])
+        return bundle
 
     def get_resource_uri(self, bundle_or_obj):
         kwargs = {
@@ -241,7 +259,9 @@ class SectionResource(Resource):
         except KeyError:
             raise NotFound("Object not found") 
 
-        return [Section(**i) for i in sectionalize(page.content)]
+        sections = map(add_html_key, sectionalize(page.content))
+
+        return [Section(**i) for i in sections]
 
     def obj_get(self, request=None, **kwargs):
         hex = request.GET.get('hex') if request else None
@@ -257,7 +277,7 @@ class SectionResource(Resource):
         except IndexError:
             raise NotFound("Object not found") 
 
-        return Section(**section)
+        return Section(**add_html_key(section))
 
     def obj_create(self, bundle, request=None, **kwargs):
         raise NotImplementedError()
@@ -282,5 +302,10 @@ class SectionResource(Resource):
         email = "%s@%s" % (user, request.META.get('REMOTE_ADDR', "localhost"))
         
         page.commit(message=message, user=user, email=email)
+
+        if self.Meta.always_return_data:
+            bundle.obj.index = int(kwargs["pk"])
+            md = get_markdown(simple=False)
+            bundle.obj.html = md.convert(bundle.obj.content)
 
         return bundle
