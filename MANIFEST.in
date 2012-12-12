@@ -1,0 +1,2 @@
+include AUTHORS COPYING README
+recursive-include aawiki *.html *.js *.css *.json
