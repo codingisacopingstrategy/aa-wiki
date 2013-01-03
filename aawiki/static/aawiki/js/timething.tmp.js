@@ -24,7 +24,6 @@ var master;
 (function ($) {
     var timelines = {},
         $canvas;
-        //master,
         //showTimeRemaining = false; // TIME DISPLAY STYLE FLAG
 
 
