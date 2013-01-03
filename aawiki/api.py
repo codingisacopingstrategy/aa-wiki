@@ -33,8 +33,36 @@ from pygit2 import GIT_OBJ_BLOB, Repository, Signature
 try: import simplejson as json
 except ImportError: import json
 
+from markdown.extensions.attr_list import get_attrs
+from markdown.extensions.attr_list import AttrListTreeprocessor
+from markdown.util import etree
+
 
 REPO = Repository(REPO_PATH)
+
+def assign_attrs(elem, attrs):
+    """ Assign attrs to element. """
+    for k, v in get_attrs(attrs):
+        if k == '.':
+            # add to class
+            cls = elem.get('class')
+            if cls:
+                elem.set('class', '%s %s' % (cls, v))
+            else:
+                elem.set('class', v)
+        else:
+            # assing attr k with v
+            elem.set(k, v)
+
+def add_attributes_key (x):
+    if not x["index"] == 0:
+        RE = AttrListTreeprocessor.HEADER_RE
+        m = list(RE.finditer(x['header'].rstrip()))
+        if m:
+            elt = etree.Element('tmp')
+            assign_attrs(elt, m[-1].group(1))
+            x['attributes'] = elt.attrib
+    return x
 
 
 def add_html_key (x):
@@ -209,6 +237,7 @@ class SectionResource(Resource):
     start = fields.IntegerField(attribute='start', readonly=True, null=True)
     end = fields.IntegerField(attribute='end', readonly=True, null=True)
     html = fields.CharField(attribute='html', readonly=True, null=True)
+    attributes = fields.DictField(attribute='attributes', readonly=True, null=True)
 
     class Meta:
         resource_name = 'section'
@@ -277,7 +306,7 @@ class SectionResource(Resource):
         except IndexError:
             raise NotFound("Object not found") 
 
-        return Section(**add_html_key(section))
+        return Section(**add_attributes_key(add_html_key(section)))
 
     def obj_create(self, bundle, request=None, **kwargs):
         raise NotImplementedError()
