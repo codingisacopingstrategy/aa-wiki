@@ -19,17 +19,27 @@
 
 (function($) {
     /**
-     * function jQuery.fn.wrapContent (selector)
+     * function jQuery.fn.wrapContent (wrapper)
      *
      * Wraps all the children of an element but the headers. 
      *    
      *    >>> $('section').wrapContent('<section class="wrapper">');
      */
-    $.fn.wrapContent = function(selector) {  
-        var selector = selector || '<div class="wrapper">';
+    $.fn.wrapContent = function(wrapper) {  
+        var wrapper = wrapper || '<div class="wrapper">';
 
         return $(this).each(function() {
-            $(this).children(":not(:header)").wrapAll(selector);
+            $(this).children(":not(:header)").wrapAll(wrapper);
         });
     };
 })(jQuery);
+
+
+//$("h2").each(function(i) {
+            //// for each header, take the header and all the elements up to the next header
+            //// and wrap them in a .box div
+            //$(this).css("cursor", "pointer").add($(this).nextUntil("h2")).wrapAll($('<div class="box"></div>'))
+            //// for each header, take the next element and all the elements up to the next header
+            //// and wrap them in a .collapsed div
+            //$(this).next().add($(this).next().nextUntil("h2")).wrapAll($('<div class="collapsed"></div>'))
+        //})
