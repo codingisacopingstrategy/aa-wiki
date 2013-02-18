@@ -17,6 +17,7 @@ setup(
         'unavailable.'),
     url='http://activearchives.org/',
     packages=['aawiki', 'aawiki.mdx', 'aawiki.management', 'aawiki.templatetags'],
+    include_package_data = True,
     dependency_links=[
         'git+git://git.constantvzw.org/aa.core2.git#egg=aacore-0.1',
         'git+git://git.constantvzw.org/aa.rdfutils.git#egg=rdfutils-0.1',
@@ -32,9 +33,9 @@ setup(
         'Markdown==2.1.0',
         'mdx-cite==1.0',
         'mdx-del-ins==1.0',
-        'mdx-outline==1.02',
-        'mdx-semanticdata==1.0',
-        'mdx-semanticwikilinks==1.1',
+        'mdx-outline==1.02.1',
+        'mdx-semanticdata==1.1',
+        'mdx-semanticwikilinks==1.1.1',
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
