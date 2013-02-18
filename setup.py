@@ -32,9 +32,12 @@ setup(
         'Markdown==2.1.0',
         'mdx-cite==1.0',
         'mdx-del-ins==1.0',
-        'mdx-outline==1.02',
-        'mdx-semanticdata==1.0',
-        'mdx-semanticwikilinks==1.1',
+        'mdx-outline==1.02.1',
+        'mdx-semanticdata==1.1',
+        'mdx-semanticwikilinks==1.1.1',
+        'diff-match-patch==20120106',
+        'GitPython==0.3.2.RC1',        
+        'cssselect==0.7.1'
     ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
