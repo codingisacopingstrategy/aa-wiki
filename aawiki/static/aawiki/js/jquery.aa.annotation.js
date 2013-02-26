@@ -164,7 +164,7 @@
     }
 
     var bar = function () {
-        console.log(this);
+        // console.log(this);
         $(this).ffind("section").wrapContent();
 
         $(this).find(":header")
@@ -176,7 +176,7 @@
     };
 
     var foo = function () {
-        console.log(this);
+        // console.log(this);
         bar.apply(this);
 
         $(this).on("geometrychange", onSectionGeometryChangeTriggered);
