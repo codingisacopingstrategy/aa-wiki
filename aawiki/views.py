@@ -253,10 +253,11 @@ def page_edit(request, slug):
                 page.obj_create(bundle, request=request)
 
             # indexes the page in the RDF store
-            url = reverse('aawiki:page-detail', kwargs={'slug': slug})
-            AAResource("http://localhost:8000" + url).index()
+            path = reverse('aawiki:page-detail', kwargs={'slug': slug})
+            url = '%s://%s%s' % (request.is_secure() and 'https' or 'http', request.get_host(), path)
+            AAResource(url).index()
 
-            return redirect(url)
+            return redirect(path)
 
     else:
         try:
