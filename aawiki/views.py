@@ -18,40 +18,30 @@
 
 import re
 import urllib
+
 try: import simplejson as json
 except ImportError: import json
 
-from django.shortcuts import (render_to_response, redirect)
-from django.http import (HttpResponse, HttpResponseRedirect)
+from django.shortcuts import render_to_response, redirect
+from django.http import HttpResponse
 from django.template import RequestContext 
-from django.template.loader import (render_to_string, get_template)
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 from aacore.models import Namespace
-#from aacore.models import (Namespace, Resource)
 
 from aawiki.filters import *
-from aawiki.models import *
-#from aacore.utils import add_resource
-from aawiki.utils import (dewikify, convert_line_endings)
-from aawiki.mdx import get_markdown
-from aawiki.mdx.mdx_sectionedit import (sectionalize, sectionalize_replace, 
-                                        DATETIMECODE_HEADER_RE, spliterator)
-from aawiki.forms import (PageEditForm, AnnotationImportForm)
+from aawiki.utils import dewikify
+from aawiki.mdx.mdx_sectionedit import sectionalize, spliterator
+from aawiki.forms import PageEditForm, AnnotationImportForm
 from aawiki.audacity import audacity_to_srt
 from aawiki.timecode import timecode_tosecs
-from aacore import RDF_MODEL
 
 from aawiki.settings import REPO_PATH
 from pygit2 import GIT_SORT_TIME, Repository, Signature, init_repository
-from aawiki.forms import PageEditForm
-from aawiki.utils import convert_line_endings
 import time
-from datetime import date, datetime, timedelta
 from diff_match_patch import diff_match_patch
 from aacore.sniffers import AAResource
-from django.contrib.sites.models import Site
 
 from aawiki.api import PageResource
 from tastypie.exceptions import NotFound
@@ -278,59 +268,6 @@ def page_edit(request, slug):
         ctx['form'] = PageEditForm(initial={"content": content})
 
     return render_to_response("aawiki/page_edit.html", ctx, context_instance=RequestContext(request))
-            
-
-    #section = int(request.REQUEST.get('section', 0))  # the document section to edit in case of section edit
-    #is_cancelled = request.REQUEST.get('cancel', None) 
-    #is_ajax = request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-
-    #context = {"slug": slug}
-
-    #if request.method == "POST": # A form was sent: processes it
-        #url = reverse('aawiki:page-detail', kwargs={'slug': slug})
-        #form = PageEditForm(request.POST)
-
-        ## The user aborded the changes: redirects her to the detail page
-        #if is_cancelled:
-            #return redirect(url)
-        
-        #if form.is_valid():  # Processes the content of the form
-            ## writes blob and commits
-            #content = form.cleaned_data["content"]
-            #content = convert_line_endings(content, 0)  # Normalizes EOL
-            #content = content.strip() + "\n\n" # Normalize whitespace around the markdown
-            #message = form.cleaned_data["message"] or "<no messages>"
-
-            #user = request.user.username if request.user.is_authenticated else "anonymous"
-            #email = "%s@%s" % (user, request.META['REMOTE_ADDR'])
-            #author = committer = Signature(user, email, time.time(), 0)
-
-            #blob_oid = repo.create_blob(content.encode("utf-8"))
-            #builder = repo.TreeBuilder(repo.head.tree)
-            #builder.insert(slug, blob_oid, 0100644)
-            #tree_oid = builder.write()
-
-            ## commits the changes
-            #repo.create_commit('HEAD', author, committer, message, tree_oid, [repo.head.oid])
-
-            ## indexes the page in the RDF store
-            #AAResource("http://localhost:8000" + url).index()
-
-            #return redirect(url)
-        #else:  # The form is invalid: returns it for ammending it.
-            #context['form'] = form
-    #else:  # GET request...
-        #try:
-            #te = repo.head.tree[slug]
-            #blob = te.to_object()
-            #content = blob.data.decode("utf-8")
-        #except KeyError:
-            #content = ""
-
-        #context['content'] = content
-        #context['form'] = PageEditForm(initial={"content": content})
-
-    #return render_to_response("aawiki/page_edit.html", context, context_instance=RequestContext(request))
 
 
 @login_required
@@ -349,20 +286,7 @@ def page_flag(request, slug):
 
 def page_history(request, slug): 
     """
-    Displays the commit list of the Git repository associated to
-    :model:`aawiki.Page`.
-
-    **Context**
-
-    ``RequestContext``
-        Request context
-    ``page``
-        An instance of :model:`aawiki.Page`.
-
-    **Template:**
-
-    :template:`aawiki/page_history.html`
-
+    Displays the commit list of the Git repository associated to a page.
     """
     def iter_commits(name):
         last_commit = None
@@ -397,40 +321,11 @@ def page_history(request, slug):
 
     return render_to_response("aawiki/page_history.html", context,
             context_instance=RequestContext(request))
-    #context = {} 
-    #name = dewikify(slug)
-
-    #try: 
-        #page = Page.objects.get(name=name) 
-    #except Page.DoesNotExist:
-        ## Redirects to the edit page
-        #url = reverse('aa-page-edit', kwargs={'slug': slug}) 
-        #return redirect(url)
-
-    #context['page'] = page
-    #context['content'] = page.content
-
-    #return render_to_response("aawiki/page_history.html", context,
-            #context_instance=RequestContext(request))
 
 
 def page_diff(request, slug): 
     """
-    Displays a comparision of two revisions of a :model:`aawiki.Page`.
-
-    **Context**
-
-    ``RequestContext``
-        Request context
-    ``page``
-        An instance of :model:`aawiki.Page`.
-    ``content``
-        The diff rendered in HTML.
-
-    **Template:**
-
-    :template:`aawiki/page_diff.html`
-
+    Displays a comparision of two revisions of a page.
     """
     def diff_prettyXhtml(self, diffs):
         """
@@ -469,32 +364,6 @@ def page_diff(request, slug):
 
     return render_to_response("aawiki/page_diff.html", context,
             context_instance=RequestContext(request))
-    ## Does the repo exist?
-    #context = {} 
-    #name = dewikify(slug)
-
-    #if request.method == "GET": # If the form has been submitted...
-        #try: 
-            #page = Page.objects.get(name=name)
-        #except Page.DoesNotExist:
-            ## Redirects to the edit page
-            #url = reverse('aa-page-edit', kwargs={'slug': slug}) 
-            #return redirect(url)
-
-        #context['page'] = page
-
-        #c1 = request.GET.get("c1", None)
-        #c2 = request.GET.get("c2", None)
-        
-        ##if c1 is None or c2 is None:
-            ##raise Http404
-
-        #context['content'] = page.diff(c1, c2)
-        #context['c1'] = page.get_commit(c1)
-        #context['c2'] = page.get_commit(c2)
-
-    #return render_to_response("aawiki/page_diff.html", context,
-            #context_instance=RequestContext(request))
 
 
 def sandbox(request):

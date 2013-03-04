@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import include, patterns, url
 from django.views.generic.simple import redirect_to
 from tastypie.api import Api
 from aawiki.api import PageResource, SectionResource

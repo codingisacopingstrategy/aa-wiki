@@ -37,7 +37,6 @@ setup(
         'mdx-semanticdata==1.1',
         'mdx-semanticwikilinks==1.1.1',
         'cssselect==0.7.1',
-        'GitPython==0.3.2.RC1',
         'diff-match-patch==20120106',
     ],
     classifiers=[
