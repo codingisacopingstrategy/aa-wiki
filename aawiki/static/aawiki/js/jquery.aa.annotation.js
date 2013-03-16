@@ -148,6 +148,57 @@
     }
 
     var onSectionGeometryChangeTriggered = function (event) {
+        var NON_PERSISTANT_CLASSES = ['section1', 'section2', 'ui-droppable',
+                'ui-draggable', 'ui-resizable', 'ui-draggable-dragging', 'editing',
+                'highlight', 'drophover', 'active'].join(' ');
+
+        // As we don't want all attributes/values to be persistent we need to
+        // perform some cleaning first. In order not to alter the original element
+        // we create a clone and perform the cleaning on it instead.
+        var $elt = $(this).clone()
+            .removeClass(NON_PERSISTANT_CLASSES)
+            .css({
+                // we only want the record the visibility if the element is hidden...
+                'display': $(this).is(":visible") ? "" : "none",
+                'position': ''
+            });
+
+        var attr_list = "";
+        var attributes = $elt.getAttributes();
+
+        delete attributes['id'];
+        delete attributes['data-section'];
+
+        console.log(attributes);
+        for (var i in attributes) {
+            if (attributes[i]) {
+                attr_list += i + "=" + '"' + attributes[i] + '" ';
+            }
+        };
+
+        attr_list = $.trim(attr_list);
+
+        console.log(attr_list);
+        console.log($(this).data("section"));
+        $.ajax(api + "/section/" + $(this).data("section") + '/', {
+            type: 'PATCH',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({attributes: attributes}),
+            beforeSend: function () {
+                console.log("before send...");
+            },
+            success: function (data) {
+                console.log("success!");
+                console.log(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert("An error occured: " + xhr.status + " " + thrownError);
+            },
+            complete: function () {
+            }
+        });
+
         event.stopPropagation()
 
     }

@@ -19,7 +19,7 @@ from tastypie.authentication import Authentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
 from tastypie.exceptions import NotFound
-from tastypie.resources import Resource
+from tastypie.resources import Resource, convert_post_to_patch, dict_strip_unicode_keys, http
 from tastypie.utils import trailing_slash
 
 import time
@@ -311,10 +311,71 @@ class SectionResource(Resource):
     def obj_create(self, bundle, request=None, **kwargs):
         raise NotImplementedError()
 
+
+    def patch_detail(self, request, **kwargs):
+        """
+        Updates a resource in-place.
+
+        Calls ``obj_update``.
+
+        If the resource is updated, return ``HttpAccepted`` (202 Accepted).
+        If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
+        """
+        request = convert_post_to_patch(request)
+
+        # We want to be able to validate the update, but we can't just pass
+        # the partial data into the validator since all data needs to be
+        # present. Instead, we basically simulate a PUT by pulling out the
+        # original data and updating it in-place.
+        # So first pull out the original object. This is essentially
+        # ``get_detail``.
+        try:
+            obj = self.cached_obj_get(request=request, **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+
+        bundle = self.build_bundle(obj=obj, request=request)
+        bundle = self.full_dehydrate(bundle)
+        bundle = self.alter_detail_data_to_serialize(request, bundle)
+
+        # Now update the bundle in-place.
+        deserialized = self.deserialize(request, request.raw_post_data, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        self.update_in_place(request, bundle, deserialized, **kwargs)
+        return http.HttpAccepted()
+
+    def update_in_place(self, request, original_bundle, new_data, **kwargs):
+        """
+        Update the object in original_bundle in-place using new_data.
+        """
+        print("fookwargs", kwargs['pk'])
+        original_bundle.data.update(**dict_strip_unicode_keys(new_data))
+
+        # Now we've got a bundle with the new data sitting in it and we're
+        # we're basically in the same spot as a PUT request. SO the rest of this
+        # function is cribbed from put_detail.
+        self.alter_deserialized_detail_data(request, original_bundle.data)
+        self.is_valid(original_bundle, request)
+
+        return self.obj_update(original_bundle, request=request, **kwargs)
+
     def obj_update(self, bundle, request=None, **kwargs):
+        #import ipdb; ipdb.set_trace()
         name = kwargs['parent_name']
 
         bundle = self.full_hydrate(bundle)
+
+        if "attributes" in bundle.data:
+            attr = "{: "
+            for i in bundle.data['attributes']:
+                if bundle.data['attributes'][i]:
+                    attr += i + '="' + bundle.data['attributes'][i] + '" '
+            attr += "}"
+            bundle.obj.content = bundle.obj.header.split("{:")[0] + attr + bundle.obj.body
+
+
+
 
         try:
             page = Page.objects.get(name)
